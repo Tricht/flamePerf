@@ -1,6 +1,6 @@
 #include <iostream>
 
-int fibRec(int n)
+unsigned long long fibRec(unsigned int n)
 {
     if (n <= 1)
     {
@@ -14,7 +14,7 @@ int fibRec(int n)
 
 int main()
 {
-    int n = 10;
+    int n = 50;
     std::cout << "Fibonacci number at position " << n << ": " << fibRec(n) << std::endl;
 
     return 0;

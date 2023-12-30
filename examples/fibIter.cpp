@@ -18,7 +18,7 @@ unsigned long long fibIter(int n)
 
 int main()
 {
-    int n = 100;
+    int n = 1000000;
     std::cout << "Fibonacci number at position " << n << ": " << fibIter(n) << std::endl;
 
     return 0;
