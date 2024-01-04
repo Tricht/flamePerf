@@ -9,7 +9,7 @@ public:
     CollectPerfData(const std::string& options);
     ~CollectPerfData();
 
-    void startCollection();
+    void recordPerf();
 
     std::string retriveData();
 
@@ -17,7 +17,7 @@ private:
     std::string options;
     bool collecting;
 
-    std::string executePerf(const std::string& command);
+    std::string scriptPerf(const std::string& command);
 };
 
 #endif
