@@ -12,7 +12,7 @@ CollectPerfData::CollectPerfData(const std::string &options):options(options), c
 void CollectPerfData::recordPerf()
 {
     if (collecting) {
-        throw "Data collection is already running.";
+        throw std::runtime_error("Data collection is already running");
     }
 
     pid_t pid = fork();
