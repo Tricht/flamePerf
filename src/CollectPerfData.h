@@ -7,7 +7,7 @@ class CollectPerfData
 {
 public: 
     CollectPerfData(const std::string& options);
-    ~CollectPerfData();
+    // ~CollectPerfData();
 
     void recordPerf();
 
@@ -16,8 +16,9 @@ public:
 private:
     std::string options;
     bool collecting;
+    pid_t perfPID;
 
-    std::string scriptPerf(const std::string& command);
+    std::string execPerf(const std::string& command);
 };
 
 #endif
