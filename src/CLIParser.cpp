@@ -20,6 +20,8 @@ void CLIParser::parseArgs()
             std::string type = argv[++i];
             if(type == "cpu") {
                 profType = ProfilingType::CPU;
+            } else if (type == "offcpu") {
+                profType = ProfilingType::OffCPU;
             } else if (type == "mem") {
                 profType = ProfilingType::Memory;
             } else if (type == "io") {

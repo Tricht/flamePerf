@@ -14,6 +14,24 @@ CollectPerfData::CollectPerfData(const std::string &options, int duration, CLIPa
 
 void CollectPerfData::recordPerf()
 {
+    switch(profType) {
+        case CLIParser::ProfilingType::CPU:
+            options = "-F 99 -e cycles -ag";
+            break;
+        case CLIParser::ProfilingType::OffCPU:
+            options = "-F 99 -e sched:sched_stat_sleep -e sched:sched_switch -e sched:sched_process_exit -ag";
+            break;
+        case CLIParser::ProfilingType::Memory:
+            options = "-F 99 -e cache-misses,cache-references -ag";
+            break;
+        case CLIParser::ProfilingType::IO:
+            options = "-F 99 -e block:block_rq_issue -ag";
+            break;
+        default:
+            options = "-F 99 -ag";
+            break;            
+    }
+
     std::future<void> collectFuture = std::async(std::launch::async, [this]() {
         pid_t pid = fork();
         if (pid == 0) {
@@ -27,7 +45,6 @@ void CollectPerfData::recordPerf()
             kill(perfPID, SIGINT);
             int status;
             waitpid(perfPID, &status, 0);
-
         } else {
             throw std::runtime_error("Failed to start perf record");
         }
