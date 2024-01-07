@@ -5,41 +5,39 @@
 #include <unistd.h>
 #include <csignal>
 #include <sys/wait.h>
+#include <chrono>
+#include <future>
 
 
-CollectPerfData::CollectPerfData(const std::string &options):options(options), collecting(false){}
+CollectPerfData::CollectPerfData(const std::string &options, int duration, CLIParser::ProfilingType profType)
+:options(options), duration(duration), profType(profType){}
 
 void CollectPerfData::recordPerf()
 {
-    if (collecting) {
-        throw std::runtime_error("Data collection is already running");
-    }
+    std::future<void> collectFuture = std::async(std::launch::async, [this]() {
+        pid_t pid = fork();
+        if (pid == 0) {
+            execlp("perf", "perf", "record", options.c_str(), (char *)NULL);
+            exit(1);
+        } else if (pid > 0) {
+            perfPID = pid;
 
-    pid_t pid = fork();
-    if (pid == 0) {
-        execlp("perf", "perf", "record", options.c_str(), (char *)NULL);
-        exit(1);
-    } else if (pid > 0) {
-        perfPID = pid;
-        collecting = true;
-    } else {
-        throw std::runtime_error("Failed to start perf record");
-    }
+            std::this_thread::sleep_for(std::chrono::seconds(duration));
+
+            kill(perfPID, SIGINT);
+            int status;
+            waitpid(perfPID, &status, 0);
+
+        } else {
+            throw std::runtime_error("Failed to start perf record");
+        }
+    });
+
+    collectFuture.get();
 }
 
 std::string CollectPerfData::retriveData()
 {
-    if (!collecting) {
-        throw std::runtime_error("data is currently not collected");
-    }
-
-    kill(perfPID, SIGINT);
-
-    int status;
-    waitpid(perfPID, &status, 0);
-
-    collecting = false;
-
     std::string perfData = execPerf("perf script");
     return perfData;
 }

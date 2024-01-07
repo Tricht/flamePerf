@@ -1,12 +1,14 @@
 #ifndef COLLECT_PERF_DATA_H
 #define COLLECT_PERF_DATA_H
 
+#include "CLIParser.h"
+
 #include <string>
 
 class CollectPerfData
 {
 public: 
-    CollectPerfData(const std::string& options);
+    CollectPerfData(const std::string& options, int duration, CLIParser::ProfilingType profType);
     // ~CollectPerfData();
 
     void recordPerf();
@@ -15,8 +17,9 @@ public:
 
 private:
     std::string options;
-    bool collecting;
     pid_t perfPID;
+    int duration;
+    CLIParser::ProfilingType profType;
 
     std::string execPerf(const std::string& command);
 };
