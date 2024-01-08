@@ -1,0 +1,4 @@
+#ifndef FLAME_GRAPH_GENERATOR_H
+#define FLAME_GRAPH_GENERATOR_H
+
+#endif
