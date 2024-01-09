@@ -1,5 +1,6 @@
 #include "CollectPerfData.h"
 #include "CLIParser.h"
+#include "FlameGraphGenerator.h"
 #include <unistd.h>
 #include <iostream>
 
@@ -18,7 +19,11 @@ int main(int argc, char** argv)
 
         CollectPerfData cpd(opt, dur, prof);
         cpd.recordPerf();
-        std::cout << cpd.retriveData();
+        std::string perfData = cpd.retriveData();
+
+        FlameGraphGenerator fgg(perfData, prof);
+        fgg.generateFlameGraph("test1.svg");
+
 
     return 0;    
     } catch (const std::exception &e){

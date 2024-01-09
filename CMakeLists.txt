@@ -9,12 +9,14 @@ set(SOURCE_FILES
     src/main.cpp
     src/CLIParser.cpp
     src/CollectPerfData.cpp
+    src/FlameGraphGenerator.cpp
     
 )
 
 set(HEADER_FILES
     src/CLIParser.h
     src/CollectPerfData.h
+    src/FlameGraphGenerator.cpp
     
 )
 
