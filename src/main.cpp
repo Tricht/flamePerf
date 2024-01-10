@@ -20,9 +20,10 @@ int main(int argc, char** argv)
         CollectPerfData cpd(opt, dur, prof);
         cpd.recordPerf();
         std::string perfData = cpd.retriveData();
+        std::cout << perfData << std::endl;
 
         FlameGraphGenerator fgg(perfData, prof);
-        fgg.generateFlameGraph("test1.svg");
+        //fgg.generateFlameGraph("test1.svg");
 
 
     return 0;    
