@@ -1,34 +1,31 @@
-#include "CollectPerfData.h"
 #include "CLIParser.h"
+#include "CollectPerfData.h"
 #include "FlameGraphGenerator.h"
-#include <unistd.h>
 #include <iostream>
+#include <stdexcept>
 
-int main(int argc, char** argv) 
-{
+int main(int argc, char** argv) {
     try {
-        CLIParser cli(argc, argv);
-        cli.parseArgs();
+        CLIParser cliParser(argc, argv);
+        cliParser.parseArgs();
+        std::cout << cliParser.getPerfOpts() << std::endl;
+        std::cout << cliParser.getDuration() << std::endl;
+        CLIParser::ProfilingType prof = cliParser.getProfType();
+        std::cout << static_cast<std::underlying_type<CLIParser::ProfilingType>::type>(prof) << std::endl;
 
-        std::string opt = cli.getPerfOpts();
-        int dur = cli.getDuration();
-        CLIParser::ProfilingType prof = CLIParser::ProfilingType::CPU;
-        std::cout << opt << std::endl;
-        std::cout << dur << std::endl;
+        CollectPerfData perfDataCollector(cliParser.getPerfOpts(), cliParser.getDuration(), prof);
 
+        perfDataCollector.recordPerf();
+        std::string perfData = perfDataCollector.retriveData();
 
-        CollectPerfData cpd(opt, dur, prof);
-        cpd.recordPerf();
-        std::string perfData = cpd.retriveData();
-        std::cout << perfData << std::endl;
+        FlameGraphGenerator flameGraphGenerator(perfData, prof);
+        flameGraphGenerator.generateFlameGraph("output.svg");
 
-        FlameGraphGenerator fgg(perfData, prof);
-        //fgg.generateFlameGraph("test1.svg");
-
-
-    return 0;    
-    } catch (const std::exception &e){
+        std::cout << "Flamegraph successfully generated as 'output.svg'" << std::endl;
+    } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;
     }
+
+    return 0;
 }

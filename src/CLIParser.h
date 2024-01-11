@@ -9,7 +9,7 @@ class CLIParser
 
 public:
     CLIParser(int argc, char** argv);
-    enum class ProfilingType {CPU, OffCPU, Memory, IO};
+    enum class ProfilingType {CPU, OffCPU, Memory, IO, Default};
 
     void parseArgs();
 

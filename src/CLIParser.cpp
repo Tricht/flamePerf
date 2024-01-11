@@ -1,7 +1,7 @@
 #include "CLIParser.h"
 #include <iostream>
 
-CLIParser::CLIParser(int argc, char **argv):argc(argc), argv(argv), perfOpts(""), duration(0){}
+CLIParser::CLIParser(int argc, char **argv):argc(argc), argv(argv), perfOpts(""), duration(0), profType(ProfilingType::Default){}
 
 void CLIParser::parseArgs()
 {
@@ -47,5 +47,5 @@ int CLIParser::getDuration()
 
 CLIParser::ProfilingType CLIParser::getProfType() const
 {
-    return ProfilingType();
+    return profType;
 }

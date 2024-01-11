@@ -7,6 +7,8 @@
 #include <sys/wait.h>
 #include <chrono>
 #include <future>
+#include <iostream>
+#include <fstream>
 
 
 CollectPerfData::CollectPerfData(const std::string &options, int duration, CLIParser::ProfilingType profType)
@@ -14,6 +16,8 @@ CollectPerfData::CollectPerfData(const std::string &options, int duration, CLIPa
 
 void CollectPerfData::recordPerf()
 {
+    std::cout << static_cast<std::underlying_type<CLIParser::ProfilingType>::type>(profType) << std::endl;
+    
     switch(profType) {
         case CLIParser::ProfilingType::CPU:
             options = "-F 99 -e cycles -ag";
@@ -27,12 +31,23 @@ void CollectPerfData::recordPerf()
         case CLIParser::ProfilingType::IO:
             options = "-F 99 -e block:block_rq_issue -ag";
             break;
+        case CLIParser::ProfilingType::Default:
+            break;    
         default:
             options = "-F 99 -ag";
             break;            
     }
 
-    std::future<void> collectFuture = std::async(std::launch::async, [this]() {
+    std::cout << options << std::endl;
+
+    std::string perfCommand = "perf record " + options + " -- sleep " + std::to_string(duration);
+
+    int status = system(perfCommand.c_str());
+    if (status != 0) {
+        std::cerr << "Failed to execute perf record: " << status << std::endl;
+    }
+
+/*     std::future<void> collectFuture = std::async(std::launch::async, [this]() {
         pid_t pid = fork();
         if (pid == 0) {
             execlp("perf", "perf", "record", options.c_str(), (char *)NULL);
@@ -50,18 +65,26 @@ void CollectPerfData::recordPerf()
         }
     });
 
-    collectFuture.get();
+    collectFuture.get(); */
 }
 
 std::string CollectPerfData::retriveData()
 {
     std::string perfData = execPerf("perf script");
+   if (perfData.empty()) {
+        throw std::runtime_error("No output from perf script");
+    }
+
+    std::ofstream abcd("perfScriptTest");
+    abcd << perfData;
+    abcd.close();
+
     return perfData;
 }
 
 std::string CollectPerfData::execPerf(const std::string &command)
 {
-    std::array<char, 128> buffer;
+    std::array<char, 1024> buffer;
     std::string result;
     std::shared_ptr<FILE> pipe(popen(command.c_str(), "r"), pclose);
     if (!pipe) {
@@ -69,7 +92,7 @@ std::string CollectPerfData::execPerf(const std::string &command)
     }
 
     while (!feof(pipe.get())) {
-        if (fgets(buffer.data(), 128, pipe.get()) != nullptr) {
+        if (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
             result += buffer.data();
         }
     }

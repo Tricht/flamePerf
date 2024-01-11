@@ -10,6 +10,7 @@ FlameGraphGenerator::FlameGraphGenerator(const std::string &perfData, CLIParser:
 void FlameGraphGenerator::generateFlameGraph(const std::string &outputPath)
 {
     std::string collapsedData = collapseStack();
+    std::cout << "Collapsed Data Length: " << collapsedData.length() << std::endl;
 
     std::string tempCollOut = "tempCollOut.tmp";
 
@@ -25,6 +26,7 @@ void FlameGraphGenerator::generateFlameGraph(const std::string &outputPath)
 
     int result = system(flameGraphCmd.c_str());
     if (result != 0) {
+        std::cerr << "FlameGraph Command: " << flameGraphCmd << std::endl;
         throw std::runtime_error("Failed to generate flamegraph");
     }
 
@@ -39,14 +41,26 @@ std::string FlameGraphGenerator::collapseStack()
 
     switch(profType) {
         case CLIParser::ProfilingType::OffCPU:
-            collapseScriptPath = "../Flamegraph/stackcollapse-perf-sched.awk";
+            collapseScriptPath = "../FlameGraph/stackcollapse-perf-sched.awk";
             break;
         default:
-            collapseScriptPath = "../Flamegraph/stackcollapse-perf.pl";
+            collapseScriptPath = "../FlameGraph/stackcollapse-perf.pl";
             break;            
     }
 
-    std::string cmd = "perl " + collapseScriptPath + " " + perfData;
+    std::string tempPerfScript = "tempPerfScript.tmp";
+
+    std::ofstream tempScriptFile(tempPerfScript);
+    if (!tempScriptFile.is_open()) {
+        throw std::runtime_error("Failed to open temp file for perf data");
+    }
+
+    tempScriptFile << perfData;
+    tempScriptFile.close();
+
+    std::string cmd = "perl " + collapseScriptPath + " " + tempPerfScript;
+
+    std::cout << cmd << std::endl;
 
     std::array<char, 128> buffer;
     std::string result;
@@ -60,6 +74,10 @@ std::string FlameGraphGenerator::collapseStack()
             result += buffer.data();
         }
     }
+
+    if (remove(tempPerfScript.c_str()) != 0) {
+    std::cerr << "Warning: Failed to delete temp perf data file" << std::endl;
+}
 
     return result; 
 }
