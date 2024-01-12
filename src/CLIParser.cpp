@@ -2,7 +2,7 @@
 #include <iostream>
 
 CLIParser::CLIParser(int argc, char **argv)
-:argc(argc), argv(argv), perfOpts(""), duration(0), profType(ProfilingType::Default), cmdToExecute(""){}
+:argc(argc), argv(argv), perfOpts(""), duration(0), profType(ProfilingType::Default), cmdToExecute(""), pidToRecord(-1) {}
 
 void CLIParser::parseArgs()
 {
@@ -37,9 +37,18 @@ void CLIParser::parseArgs()
                 std::cerr << "Invalid profiling type" << std::endl;
             }
 
-        // instead of duration, measure a command    
+        // instead of duration, measure a command...    
         } else if (arg == "-c" || arg == "--cmd") {
             cmdToExecute = argv[++i];
+
+        // ...or pid
+        } else if (arg == "--pid") {   
+            try {
+                pidToRecord = std::stoi(argv[++i]);
+            } catch (const std::invalid_argument& e) {
+                std::cerr << "Invalid pid value" << std::endl;
+                throw;
+            }
 
         // help message    
         } else {
@@ -66,4 +75,9 @@ CLIParser::ProfilingType CLIParser::getProfType() const
 std::string CLIParser::getCmdToExecute() const
 {
     return cmdToExecute;
+}
+
+int CLIParser::getPidToRecord()
+{
+    return pidToRecord;
 }

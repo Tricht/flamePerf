@@ -17,6 +17,7 @@ public:
     int getDuration();
     ProfilingType getProfType() const;
     std::string getCmdToExecute() const;
+    int getPidToRecord();
 
 
 private:
@@ -26,6 +27,7 @@ private:
     int duration;
     ProfilingType profType;
     std::string cmdToExecute;
+    int pidToRecord;
 
 };
 

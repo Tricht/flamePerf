@@ -11,8 +11,8 @@
 #include <fstream>
 
 
-CollectPerfData::CollectPerfData(const std::string &options, int duration, CLIParser::ProfilingType profType, const std::string &cmd)
-:options(options), duration(duration), profType(profType), cmdToExecute(cmd) {}
+CollectPerfData::CollectPerfData(const std::string &options, int duration, CLIParser::ProfilingType profType, const std::string &cmd, int pidToRecord)
+:options(options), duration(duration), profType(profType), cmdToExecute(cmd), pidToRecord(pidToRecord) {}
 
 void CollectPerfData::recordPerf()
 {
@@ -44,6 +44,8 @@ void CollectPerfData::recordPerf()
 
     if (!cmdToExecute.empty()) {
         perfCommand += " -- " + cmdToExecute;
+    } else if (pidToRecord > -1) {
+        perfCommand += " --pid " + std::to_string(pidToRecord);
     } else {
         perfCommand += " -- sleep " + std::to_string(duration);
     }
