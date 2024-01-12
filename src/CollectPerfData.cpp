@@ -11,8 +11,8 @@
 #include <fstream>
 
 
-CollectPerfData::CollectPerfData(const std::string &options, int duration, CLIParser::ProfilingType profType)
-:options(options), duration(duration), profType(profType){}
+CollectPerfData::CollectPerfData(const std::string &options, int duration, CLIParser::ProfilingType profType, const std::string &cmd)
+:options(options), duration(duration), profType(profType), cmdToExecute(cmd) {}
 
 void CollectPerfData::recordPerf()
 {
@@ -38,9 +38,15 @@ void CollectPerfData::recordPerf()
             break;            
     }
 
-    std::cout << options << std::endl;
+    std::cout << options << std::endl;  
 
-    std::string perfCommand = "perf record " + options + " -- sleep " + std::to_string(duration);
+    std::string perfCommand = "perf record " + options;
+
+    if (!cmdToExecute.empty()) {
+        perfCommand += " -- " + cmdToExecute;
+    } else {
+        perfCommand += " -- sleep " + std::to_string(duration);
+    }
 
     int status = system(perfCommand.c_str());
     if (status != 0) {

@@ -8,7 +8,7 @@
 class CollectPerfData
 {
 public: 
-    CollectPerfData(const std::string& options, int duration, CLIParser::ProfilingType profType);
+    CollectPerfData(const std::string &options, int duration, CLIParser::ProfilingType profType, const std::string &cmd);
     // ~CollectPerfData();
 
     void recordPerf();
@@ -20,6 +20,7 @@ private:
     pid_t perfPID;
     int duration;
     CLIParser::ProfilingType profType;
+    std::string cmdToExecute;
 
     std::string execPerf(const std::string& command);
 };

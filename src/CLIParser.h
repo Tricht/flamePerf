@@ -16,6 +16,7 @@ public:
     std::string getPerfOpts();
     int getDuration();
     ProfilingType getProfType() const;
+    std::string getCmdToExecute() const;
 
 
 private:
@@ -24,6 +25,7 @@ private:
     std::string perfOpts;
     int duration;
     ProfilingType profType;
+    std::string cmdToExecute;
 
 };
 
