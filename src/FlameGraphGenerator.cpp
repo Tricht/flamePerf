@@ -22,7 +22,24 @@ void FlameGraphGenerator::generateFlameGraph(const std::string &outputPath)
     tempOutFile << collapsedData;
     tempOutFile.close();
 
-    std::string flameGraphCmd = "perl ../FlameGraph/flamegraph.pl " + tempCollOut + " > " + outputPath;
+    std::string colorPalette;
+    switch(profType) {
+        case CLIParser::ProfilingType::CPU:
+            colorPalette = "--color=java";
+            break;
+        case CLIParser::ProfilingType::OffCPU:
+            colorPalette = "--color=io";
+            break;
+        case CLIParser::ProfilingType::Memory:
+            colorPalette = "--color=mem";
+            break;
+        case CLIParser::ProfilingType::IO:
+            colorPalette = "--color=wakeup";
+            break;             
+    
+}
+
+    std::string flameGraphCmd = "perl ../FlameGraph/flamegraph.pl " + colorPalette + " " + tempCollOut + " > " + outputPath;
 
     int result = system(flameGraphCmd.c_str());
     if (result != 0) {
@@ -41,7 +58,7 @@ std::string FlameGraphGenerator::collapseStack()
 
     switch(profType) {
         case CLIParser::ProfilingType::OffCPU:
-            collapseScriptPath = "../FlameGraph/stackcollapse-perf-sched.awk";
+            collapseScriptPath = "../FlameGraph/stackcollapse-perf.pl";
             break;
         default:
             collapseScriptPath = "../FlameGraph/stackcollapse-perf.pl";
@@ -58,7 +75,7 @@ std::string FlameGraphGenerator::collapseStack()
     tempScriptFile << perfData;
     tempScriptFile.close();
 
-    std::string cmd = "perl " + collapseScriptPath + " " + tempPerfScript;
+    std::string cmd = "perl " + collapseScriptPath + " --all " + tempPerfScript;
 
     std::cout << cmd << std::endl;
 
