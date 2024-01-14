@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
         std::cout << static_cast<std::underlying_type<CLIParser::ProfilingType>::type>(prof) << std::endl;
 
         CollectPerfData perfDataCollector(cliParser.getPerfOpts(), cliParser.getDuration(), prof, cliParser.getCmdToExecute(), cliParser.getPidToRecord());
-
+        perfDataCollector.initialize();
         perfDataCollector.recordPerf();
         std::string perfData = perfDataCollector.retriveData();
 

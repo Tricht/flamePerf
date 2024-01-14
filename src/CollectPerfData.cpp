@@ -9,6 +9,9 @@
 #include <future>
 #include <iostream>
 #include <fstream>
+#include <sys/stat.h>
+#include <sstream>
+#include <iomanip>
 
 
 CollectPerfData::CollectPerfData(const std::string &options, int duration, CLIParser::ProfilingType profType, const std::string &cmd, int pidToRecord)
@@ -83,11 +86,26 @@ std::string CollectPerfData::retriveData()
         throw std::runtime_error("No output from perf script");
     }
 
-    std::ofstream abcd("perfScriptTest");
-    abcd << perfData;
-    abcd.close();
+    std::string fileName = genFileName();
+    std::ofstream outFile(fileName);
+    if (!outFile.is_open()) {
+        throw std::runtime_error("Unable to open file: " + fileName);
+    }
+
+    outFile << perfData;
+    outFile.close();
 
     return perfData;
+}
+
+void CollectPerfData::initialize()
+{
+    const char* dirName = "./stack_profiles";
+    if (mkdir(dirName, 0777) == -1) {
+        if (errno != EEXIST) {
+            throw std::runtime_error("Failed to create directory");
+        }
+    }
 }
 
 std::string CollectPerfData::execPerf(const std::string &command)
@@ -106,4 +124,40 @@ std::string CollectPerfData::execPerf(const std::string &command)
     }
 
     return result;
+}
+
+std::string CollectPerfData::genFileName()
+{
+    auto now = std::chrono::system_clock::now();
+    auto now_c = std::chrono::system_clock::to_time_t(now);
+    std::stringstream ss;
+    ss << "./stack_profiles/profile_" << std::put_time(std::localtime(&now_c), "%d%m%Y_%H%M%S");
+
+    switch (profType)
+    {
+    case CLIParser::ProfilingType::CPU:
+        ss << "_CPU";
+        break;
+    case CLIParser::ProfilingType::OffCPU:
+        ss << "_OffCPU";
+        break;        
+    case CLIParser::ProfilingType::Memory:
+        ss << "_Mem";
+        break;    
+    case CLIParser::ProfilingType::IO:
+        ss << "_IO";
+        break;
+
+    default:
+        ss << "";
+        break;
+    }
+
+    if (!cmdToExecute.empty()) {
+        ss << "_" << cmdToExecute;
+    }
+
+    ss << ".stacks";
+
+    return ss.str();
 }

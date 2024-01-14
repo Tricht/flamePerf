@@ -34,7 +34,7 @@ void FlameGraphGenerator::generateFlameGraph(const std::string &outputPath)
             colorPalette = "--color=mem";
             break;
         case CLIParser::ProfilingType::IO:
-            colorPalette = "--color=wakeup";
+            colorPalette = "--color=yellow";
             break;             
     
 }

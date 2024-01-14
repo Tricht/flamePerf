@@ -15,6 +15,8 @@ public:
 
     std::string retriveData();
 
+    void initialize();
+
 private:
     std::string options;
     pid_t perfPID;
@@ -24,6 +26,7 @@ private:
     int pidToRecord;
 
     std::string execPerf(const std::string& command);
+    std::string genFileName();
 };
 
 #endif
