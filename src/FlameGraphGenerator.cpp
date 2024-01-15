@@ -3,6 +3,7 @@
 #include <array>
 #include <memory>
 #include <iostream>
+#include <sstream>
 
 FlameGraphGenerator::FlameGraphGenerator() {}
 
@@ -56,7 +57,42 @@ void FlameGraphGenerator::generateFlameGraph(const std::string &outputPath)
 
 void FlameGraphGenerator::generateCombinedHtml(const std::vector<std::string> &fileNames)
 {
-    std::ofstream htmlFile("combined_fg.html");
+    std::ifstream templateFile("../utils/template.html");
+    std::stringstream buffer;
+    buffer << templateFile.rdbuf();
+    std::string htmlContent = buffer.str();
+    templateFile.close();
+
+    std::string tabs, content;
+
+    for (size_t i = 0; i < fileNames.size(); ++i) {
+        tabs += "<div class='tab" + std::string(i == 0 ? " active" : "") + "' onclick='openTab(event, \"tab" + std::to_string(i + 1) + "\")'>Tab " + std::to_string(i + 1) + "</div>";
+        content += "<div id='tab" + std::to_string(i + 1) + "' class='content" + std::string(i == 0 ? " active" : "") + "'>";
+
+        std::ifstream svgFile(fileNames[i]);
+        std::string svgCode((std::istreambuf_iterator<char>(svgFile)), std::istreambuf_iterator<char>());
+        svgFile.close();
+
+        content += svgCode;
+        content += "</div>";
+    }
+
+    size_t tabsPos = htmlContent.find("{{tabs}}");
+    if (tabsPos != std::string::npos) {
+        htmlContent.replace(tabsPos, 8, tabs);
+    }
+
+    size_t contentPos = htmlContent.find("{{content}}");
+    if (contentPos != std::string::npos) {
+        htmlContent.replace(contentPos, 11, content);
+    }
+
+    std::ofstream outputFile("combined_fg.html");
+    outputFile << htmlContent;
+    
+    outputFile.close();
+    
+    /* std::ofstream htmlFile("combined_fg.html");
     if (!htmlFile.is_open()) {
         throw std::runtime_error("Unable to open combined HTML file");
     }
@@ -76,7 +112,7 @@ void FlameGraphGenerator::generateCombinedHtml(const std::vector<std::string> &f
     }
 
     htmlFile << "</body></html>";
-    htmlFile.close(); 
+    htmlFile.close(); */ 
 }
 
 std::string FlameGraphGenerator::collapseStack()
