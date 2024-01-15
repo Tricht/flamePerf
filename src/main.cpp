@@ -4,7 +4,7 @@
 #include <iostream>
 #include <stdexcept>
 
-int main(int argc, char** argv) {
+/* int main(int argc, char** argv) {
     try {
         CLIParser cliParser(argc, argv);
         cliParser.parseArgs();
@@ -22,6 +22,23 @@ int main(int argc, char** argv) {
         flameGraphGenerator.generateFlameGraph("output.svg");
 
         std::cout << "Flamegraph successfully generated as 'output.svg'" << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
+    }
+
+    return 0;
+} */
+int main(int argc, char** argv) {
+    try {
+        CLIParser cliParser(argc, argv);
+        cliParser.parseArgs();
+        
+        CollectPerfData perfDataCollector(cliParser.getPerfOpts(), cliParser.getDuration(), cliParser.getProfType(), cliParser.getCmdToExecute(), cliParser.getPidToRecord());
+        perfDataCollector.initialize();
+        perfDataCollector.recordAllProfiles();
+
+        std::cout << "Combined Flamegraph successfully generated" << std::endl;
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;

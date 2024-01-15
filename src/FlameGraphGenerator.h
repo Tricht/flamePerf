@@ -7,9 +7,13 @@
 class FlameGraphGenerator 
 {
 public:
+    FlameGraphGenerator();
+    
     FlameGraphGenerator(const std::string& perfData, CLIParser::ProfilingType profType);
 
     void generateFlameGraph(const std::string& outputPath);
+
+    void generateCombinedHtml(const std::vector<std::string>& fileNames);
 
 private:
     std::string perfData;

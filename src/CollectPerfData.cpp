@@ -12,9 +12,10 @@
 #include <sys/stat.h>
 #include <sstream>
 #include <iomanip>
+#include "FlameGraphGenerator.h"
 
 
-CollectPerfData::CollectPerfData(const std::string &options, int duration, CLIParser::ProfilingType profType, const std::string &cmd, int pidToRecord)
+CollectPerfData::CollectPerfData(const std::string& options, int duration, CLIParser::ProfilingType profType, const std::string& cmd, int pidToRecord)
 :options(options), duration(duration), profType(profType), cmdToExecute(cmd), pidToRecord(pidToRecord) {}
 
 void CollectPerfData::recordPerf()
@@ -126,6 +127,28 @@ std::string CollectPerfData::execPerf(const std::string &command)
     return result;
 }
 
+void CollectPerfData::setProfilingType(CLIParser::ProfilingType type)
+{
+    profType = type;
+    switch (type) {
+        case CLIParser::ProfilingType::CPU:
+            options = "-F 99 -e cycles -ag";
+            break;
+        case CLIParser::ProfilingType::OffCPU:
+            options = "-F 99 -e sched:sched_stat_sleep -e sched:sched_switch -e sched:sched_process_exit -ag";
+            break;
+        case CLIParser::ProfilingType::Memory:
+            options = "-F 99 -e cache-misses,cache-references -ag";
+            break;
+        case CLIParser::ProfilingType::IO:
+            options = "-F 99 -e block:block_rq_issue -ag";
+            break;
+        default:
+            options = "-F 99 -ag";
+            break;
+    }
+}
+
 std::string CollectPerfData::genFileName()
 {
     auto now = std::chrono::system_clock::now();
@@ -157,7 +180,44 @@ std::string CollectPerfData::genFileName()
         ss << "_" << cmdToExecute;
     }
 
-    ss << ".stacks";
+    // ss << ".stacks";
 
     return ss.str();
 }
+
+void CollectPerfData::recordAllProfiles()
+{
+    const std::array<CLIParser::ProfilingType, 4> allTypes = {
+        CLIParser::ProfilingType::CPU,
+        CLIParser::ProfilingType::OffCPU,
+        CLIParser::ProfilingType::Memory,
+        CLIParser::ProfilingType::IO        
+    };
+
+    std::vector<std::string> fgFileNames;
+
+    for (auto type : allTypes) {
+        setProfilingType(type);
+        recordPerf();
+        
+        std::string perfData = retriveData();
+        std::string profFileName = genFileName();
+
+        std::ofstream outFile(profFileName);
+        if (!outFile.is_open()) {
+            throw std::runtime_error("Unable to open file: " + profFileName);
+        }
+        outFile << perfData;
+        outFile.close();
+
+        std::string fgFileName = profFileName + ".svg";
+        FlameGraphGenerator flameGraphGenerator(perfData, type);
+        flameGraphGenerator.generateFlameGraph(fgFileName);  
+        fgFileNames .push_back(fgFileName);              
+    }
+
+    FlameGraphGenerator fgGenerator;
+    fgGenerator.generateCombinedHtml(fgFileNames);
+}
+
+

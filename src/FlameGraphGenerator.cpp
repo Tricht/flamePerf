@@ -4,8 +4,10 @@
 #include <memory>
 #include <iostream>
 
+FlameGraphGenerator::FlameGraphGenerator() {}
+
 FlameGraphGenerator::FlameGraphGenerator(const std::string &perfData, CLIParser::ProfilingType profType)
-:perfData(perfData), profType(profType){}
+    : perfData(perfData), profType(profType) {}
 
 void FlameGraphGenerator::generateFlameGraph(const std::string &outputPath)
 {
@@ -50,6 +52,31 @@ void FlameGraphGenerator::generateFlameGraph(const std::string &outputPath)
     if (remove(tempCollOut.c_str()) != 0) {
         std::cerr << "Failed to delete temp file" << std::endl;
     }
+}
+
+void FlameGraphGenerator::generateCombinedHtml(const std::vector<std::string> &fileNames)
+{
+    std::ofstream htmlFile("combined_fg.html");
+    if (!htmlFile.is_open()) {
+        throw std::runtime_error("Unable to open combined HTML file");
+    }
+
+    htmlFile << "<html><body>";
+    for (const auto& name : fileNames) {
+        std::ifstream svgFile(name);
+        if (!svgFile.is_open()) {
+            throw std::runtime_error("Unable to open flamegraph file: " + name);
+        }
+
+        std::string svgCode((std::istreambuf_iterator<char>(svgFile)), std::istreambuf_iterator<char>());
+
+        svgFile.close();
+
+        htmlFile << "<div>" << svgCode << "</div>";
+    }
+
+    htmlFile << "</body></html>";
+    htmlFile.close(); 
 }
 
 std::string FlameGraphGenerator::collapseStack()
