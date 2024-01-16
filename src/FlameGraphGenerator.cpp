@@ -91,28 +91,6 @@ void FlameGraphGenerator::generateCombinedHtml(const std::vector<std::string> &f
     outputFile << htmlContent;
     
     outputFile.close();
-    
-    /* std::ofstream htmlFile("combined_fg.html");
-    if (!htmlFile.is_open()) {
-        throw std::runtime_error("Unable to open combined HTML file");
-    }
-
-    htmlFile << "<html><body>";
-    for (const auto& name : fileNames) {
-        std::ifstream svgFile(name);
-        if (!svgFile.is_open()) {
-            throw std::runtime_error("Unable to open flamegraph file: " + name);
-        }
-
-        std::string svgCode((std::istreambuf_iterator<char>(svgFile)), std::istreambuf_iterator<char>());
-
-        svgFile.close();
-
-        htmlFile << "<div>" << svgCode << "</div>";
-    }
-
-    htmlFile << "</body></html>";
-    htmlFile.close(); */ 
 }
 
 std::string FlameGraphGenerator::collapseStack()

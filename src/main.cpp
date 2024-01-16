@@ -36,9 +36,22 @@ int main(int argc, char** argv) {
         
         CollectPerfData perfDataCollector(cliParser.getPerfOpts(), cliParser.getDuration(), cliParser.getProfType(), cliParser.getCmdToExecute(), cliParser.getPidToRecord());
         perfDataCollector.initialize();
-        perfDataCollector.recordAllProfiles();
+        
 
-        std::cout << "Combined Flamegraph successfully generated" << std::endl;
+        if (cliParser.shouldRecordAllProfiles()) {
+            perfDataCollector.recordAllProfiles();
+        } else {
+            CLIParser::ProfilingType prof = cliParser.getProfType();
+            perfDataCollector.recordPerf();
+            std::string perfData = perfDataCollector.retriveData();
+            std::string fgName = perfDataCollector.genFileName();
+
+            FlameGraphGenerator flameGraphGenerator(perfData, prof);
+            
+            flameGraphGenerator.generateFlameGraph(fgName + ".svg");
+        }
+
+        std::cout << "Flamegraph(s) successfully generated" << std::endl;
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;

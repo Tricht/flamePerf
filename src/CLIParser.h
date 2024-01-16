@@ -18,6 +18,7 @@ public:
     ProfilingType getProfType() const;
     std::string getCmdToExecute() const;
     int getPidToRecord();
+    bool shouldRecordAllProfiles() const;
 
 
 private:
@@ -28,6 +29,7 @@ private:
     ProfilingType profType;
     std::string cmdToExecute;
     int pidToRecord;
+    bool allProfiles;
 
 };
 

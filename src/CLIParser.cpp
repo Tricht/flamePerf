@@ -2,7 +2,7 @@
 #include <iostream>
 
 CLIParser::CLIParser(int argc, char **argv)
-:argc(argc), argv(argv), perfOpts(""), duration(0), profType(ProfilingType::Default), cmdToExecute(""), pidToRecord(-1) {}
+:argc(argc), argv(argv), perfOpts(""), duration(0), profType(ProfilingType::Default), cmdToExecute(""), pidToRecord(-1), allProfiles(false) {}
 
 void CLIParser::parseArgs()
 {
@@ -50,6 +50,10 @@ void CLIParser::parseArgs()
                 throw;
             }
 
+        // record all profiles
+        } else if (arg == "--all-profiles") {
+            allProfiles = true;
+
         // help message    
         } else {
             std::cout << "Usage: " << std::endl;
@@ -80,4 +84,9 @@ std::string CLIParser::getCmdToExecute() const
 int CLIParser::getPidToRecord()
 {
     return pidToRecord;
+}
+
+bool CLIParser::shouldRecordAllProfiles() const
+{
+    return allProfiles;
 }
