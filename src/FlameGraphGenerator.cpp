@@ -42,7 +42,7 @@ void FlameGraphGenerator::generateFlameGraph(const std::string &outputPath)
     
 }
 
-    std::string flameGraphCmd = "perl ../FlameGraph/flamegraph.pl " + colorPalette + " " + tempCollOut + " > " + outputPath;
+    std::string flameGraphCmd = "perl ../FlameGraph/flamegraph.pl " + colorPalette + " " + tempCollOut + " > " + outputPath + ".svg";
 
     int result = system(flameGraphCmd.c_str());
     if (result != 0) {

@@ -23,7 +23,7 @@ void CollectPerfData::recordPerf()
 {
     std::cout << static_cast<std::underlying_type<CLIParser::ProfilingType>::type>(profType) << std::endl;
     
-    switch(profType) {
+/*     switch(profType) {
         case CLIParser::ProfilingType::CPU:
             options = "-F 99 -e cycles -ag";
             break;
@@ -41,8 +41,10 @@ void CollectPerfData::recordPerf()
         default:
             options = "-F 99 -ag";
             break;            
-    }
+    } */
 
+    setProfilingType(profType);
+    
     std::cout << options << std::endl;  
 
     std::string perfCommand = "perf record " + options;
@@ -58,6 +60,7 @@ void CollectPerfData::recordPerf()
     int status = system(perfCommand.c_str());
     if (status != 0) {
         std::cerr << "Failed to execute perf record: " << status << std::endl;
+        exit(1);
     }
 
 /*     std::future<void> collectFuture = std::async(std::launch::async, [this]() {
@@ -102,7 +105,7 @@ std::string CollectPerfData::retriveData()
 
 void CollectPerfData::initialize()
 {
-    const char* dirName = "./stack_profiles";
+    const char* dirName = "./results";
     if (mkdir(dirName, 0777) == -1) {
         if (errno != EEXIST) {
             throw std::runtime_error("Failed to create directory");
@@ -142,8 +145,11 @@ void CollectPerfData::setProfilingType(CLIParser::ProfilingType type)
             options = "-F 99 -e cache-misses,cache-references -ag";
             break;
         case CLIParser::ProfilingType::IO:
-            options = "-F 99 -e block:block_rq_issue -ag";
+            options = "--F 99 -e block:block_rq_issue -ag";
             break;
+        case CLIParser::ProfilingType::Default:
+            options = "-F 99 -ag";
+            break;    
         default:
             options = "-F 99 -ag";
             break;
@@ -155,7 +161,7 @@ std::string CollectPerfData::genFileName()
     auto now = std::chrono::system_clock::now();
     auto now_c = std::chrono::system_clock::to_time_t(now);
     std::stringstream ss;
-    ss << "./stack_profiles/profile_" << std::put_time(std::localtime(&now_c), "%d%m%Y_%H%M%S");
+    ss << "./results/profile_" << std::put_time(std::localtime(&now_c), "%d%m%Y_%H%M%S");
 
     switch (profType)
     {
@@ -180,7 +186,10 @@ std::string CollectPerfData::genFileName()
     if (!cmdToExecute.empty()) {
         std::string safeCmd = cmdToExecute;
         std::replace(safeCmd.begin(), safeCmd.end(), ' ', '_');
-        std::replace(safeCmd.begin(), safeCmd.end(), '-', '_');
+        safeCmd.erase(std::remove(safeCmd.begin(), safeCmd.end(), '-'), safeCmd.end());
+        safeCmd.erase(std::remove(safeCmd.begin(), safeCmd.end(), '.'), safeCmd.end());
+        safeCmd.erase(std::remove(safeCmd.begin(), safeCmd.end(), '/'), safeCmd.end());
+
         ss << "_" << safeCmd;
     }
 
@@ -199,7 +208,8 @@ void CollectPerfData::recordAllProfiles()
     std::vector<std::string> fgFileNames;
 
     for (auto type : allTypes) {
-        setProfilingType(type);
+        // setProfilingType(type);
+        profType = type;
         recordPerf();
         
         std::string perfData = retriveData();
@@ -212,14 +222,12 @@ void CollectPerfData::recordAllProfiles()
         outFile << perfData;
         outFile.close();
 
-        std::string fgFileName = profFileName + ".svg";
+        //std::string fgFileName = profFileName + ".svg";
         FlameGraphGenerator flameGraphGenerator(perfData, type);
-        flameGraphGenerator.generateFlameGraph(fgFileName);  
-        fgFileNames .push_back(fgFileName);              
+        flameGraphGenerator.generateFlameGraph(profFileName);  
+        fgFileNames.push_back(profFileName + ".svg");              
     }
 
     FlameGraphGenerator fgGenerator;
     fgGenerator.generateCombinedHtml(fgFileNames);
 }
-
-

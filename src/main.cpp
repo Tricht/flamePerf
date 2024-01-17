@@ -33,14 +33,14 @@ int main(int argc, char** argv) {
     try {
         CLIParser cliParser(argc, argv);
         cliParser.parseArgs();
-        
-        CollectPerfData perfDataCollector(cliParser.getPerfOpts(), cliParser.getDuration(), cliParser.getProfType(), cliParser.getCmdToExecute(), cliParser.getPidToRecord());
-        perfDataCollector.initialize();
-        
 
         if (cliParser.shouldRecordAllProfiles()) {
+            CollectPerfData perfDataCollector(cliParser.getPerfOpts(), cliParser.getDuration(), cliParser.getProfType(), cliParser.getCmdToExecute(), cliParser.getPidToRecord());
+            perfDataCollector.initialize();
             perfDataCollector.recordAllProfiles();
         } else {
+            CollectPerfData perfDataCollector(cliParser.getPerfOpts(), cliParser.getDuration(), cliParser.getProfType(), cliParser.getCmdToExecute(), cliParser.getPidToRecord());
+            perfDataCollector.initialize();
             CLIParser::ProfilingType prof = cliParser.getProfType();
             perfDataCollector.recordPerf();
             std::string perfData = perfDataCollector.retriveData();
@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
 
             FlameGraphGenerator flameGraphGenerator(perfData, prof);
             
-            flameGraphGenerator.generateFlameGraph(fgName + ".svg");
+            flameGraphGenerator.generateFlameGraph(fgName);
         }
 
         std::cout << "Flamegraph(s) successfully generated" << std::endl;
