@@ -12,6 +12,7 @@
 #include <sys/stat.h>
 #include <sstream>
 #include <iomanip>
+#include <algorithm>
 #include "FlameGraphGenerator.h"
 
 
@@ -177,10 +178,11 @@ std::string CollectPerfData::genFileName()
     }
 
     if (!cmdToExecute.empty()) {
-        ss << "_" << cmdToExecute;
+        std::string safeCmd = cmdToExecute;
+        std::replace(safeCmd.begin(), safeCmd.end(), ' ', '_');
+        std::replace(safeCmd.begin(), safeCmd.end(), '-', '_');
+        ss << "_" << safeCmd;
     }
-
-    // ss << ".stacks";
 
     return ss.str();
 }
