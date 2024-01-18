@@ -82,21 +82,31 @@ void FlameGraphGenerator::generateCombinedHtml(const std::vector<std::string> &f
 
         // create tab and content area for specific flamegraph
         tabs += "<div class='tab" + std::string(i == 0 ? " active" : "") + "' onclick='openTab(event, \"tab" + std::to_string(i + 1) + "\")'>" + profileName + "</div>";
-        content += "<div id='tab" + std::to_string(i + 1) + "' class='content" + std::string(i == 0 ? " active" : "") + "'>";
+        content += "<div id='tab" + std::to_string(i + 1) + "' class='content flamegraph" + std::string(i == 0 ? " active" : "") + "'>";
 
-        // read svg file and delete javscript
+        // read svg file
         std::ifstream svgFile(fileNames[i]);
         std::stringstream svgBuffer;
         svgBuffer << svgFile.rdbuf();
         svgFile.close();
-
+        // ...and delete javscript
         std::string svgCode = svgBuffer.str();
         size_t scriptStart = svgCode.find("<script");
         if (scriptStart != std::string::npos) {
             size_t scriptEnd = svgCode.find("</script>", scriptStart);
             svgCode.erase(scriptStart, (scriptEnd - scriptStart) + 9); // </script> = 9
         }
-        
+        // ...and delete onload function, will be replaced by own js
+        size_t onloadStart = svgCode.find("onload=\"init(evt)\"");
+        if (onloadStart != std::string::npos) {
+            svgCode.erase(onloadStart, std::string("onload=\"init(evt)\"").length());
+        } 
+
+        size_t svgStart = svgCode.find("<svg");
+        if (svgStart != std::string::npos) {
+            svgCode.insert(svgStart + 4, " class='flamegraph'");
+        }
+
         content += svgCode;
         content += "</div>";
         

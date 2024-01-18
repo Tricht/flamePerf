@@ -19,6 +19,10 @@
         .content.active {
             display: block;
         }
+        .flamegraph {
+            width: 100%;
+            height: auto;
+        }
     </style>
     <script>
         function openTab(evt, tabName) {
@@ -32,7 +36,7 @@
             for (i = 0; i < tablinks.length; i++) {
                 tablinks[i].className = tablinks[i].className.replace(" active", "");
             }
-    
+
             document.getElementById(tabName).style.display = "block";
             evt.currentTarget.className += " active";
         }
@@ -46,5 +50,9 @@
     <div id="content-container">
         {{content}}
     </div>
+
+    <script src="../../utils/flamegraph_script.js"></script>
 </body>
 </html>
+
+
