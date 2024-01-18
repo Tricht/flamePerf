@@ -145,7 +145,7 @@ void CollectPerfData::setProfilingType(CLIParser::ProfilingType type)
             options = "-F 99 -e cache-misses,cache-references -ag";
             break;
         case CLIParser::ProfilingType::IO:
-            options = "--F 99 -e block:block_rq_issue -ag";
+            options = "-F 99 -e block:block_rq_issue -ag";
             break;
         case CLIParser::ProfilingType::Default:
             options = "-F 99 -ag";

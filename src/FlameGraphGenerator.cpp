@@ -4,6 +4,8 @@
 #include <memory>
 #include <iostream>
 #include <sstream>
+#include <chrono>
+#include <iomanip>
 
 FlameGraphGenerator::FlameGraphGenerator() {}
 
@@ -57,6 +59,12 @@ void FlameGraphGenerator::generateFlameGraph(const std::string &outputPath)
 
 void FlameGraphGenerator::generateCombinedHtml(const std::vector<std::string> &fileNames)
 {
+    auto now = std::chrono::system_clock::now();
+    auto now_c = std::chrono::system_clock::to_time_t(now);
+    std::stringstream ss;
+    ss << "./results/flamegraphs_" << std::put_time(std::localtime(&now_c), "%d%m%Y_%H%M%S") << ".html";
+    std::string htmlFileName = ss.str();
+    
     std::ifstream templateFile("../utils/template.html");
     std::stringstream buffer;
     buffer << templateFile.rdbuf();
@@ -66,15 +74,38 @@ void FlameGraphGenerator::generateCombinedHtml(const std::vector<std::string> &f
     std::string tabs, content;
 
     for (size_t i = 0; i < fileNames.size(); ++i) {
-        tabs += "<div class='tab" + std::string(i == 0 ? " active" : "") + "' onclick='openTab(event, \"tab" + std::to_string(i + 1) + "\")'>Tab " + std::to_string(i + 1) + "</div>";
+        // naming for tabs
+        size_t lastSlash = fileNames[i].find_last_of("/\\");
+        std::string fileName = (lastSlash != std::string::npos) ? fileNames[i].substr(lastSlash + 1) : fileNames[i];
+        size_t dotPos = fileName.find_last_of('.');
+        std::string profileName = (dotPos != std::string::npos) ? fileName.substr(0, dotPos) : fileName;
+
+        // create tab and content area for specific flamegraph
+        tabs += "<div class='tab" + std::string(i == 0 ? " active" : "") + "' onclick='openTab(event, \"tab" + std::to_string(i + 1) + "\")'>" + profileName + "</div>";
         content += "<div id='tab" + std::to_string(i + 1) + "' class='content" + std::string(i == 0 ? " active" : "") + "'>";
 
+        // read svg file and delete javscript
         std::ifstream svgFile(fileNames[i]);
+        std::stringstream svgBuffer;
+        svgBuffer << svgFile.rdbuf();
+        svgFile.close();
+
+        std::string svgCode = svgBuffer.str();
+        size_t scriptStart = svgCode.find("<script");
+        if (scriptStart != std::string::npos) {
+            size_t scriptEnd = svgCode.find("</script>", scriptStart);
+            svgCode.erase(scriptStart, (scriptEnd - scriptStart) + 9); // </script> = 9
+        }
+        
+        content += svgCode;
+        content += "</div>";
+        
+        /* std::ifstream svgFile(fileNames[i]);
         std::string svgCode((std::istreambuf_iterator<char>(svgFile)), std::istreambuf_iterator<char>());
         svgFile.close();
 
         content += svgCode;
-        content += "</div>";
+        content += "</div>"; */
     }
 
     size_t tabsPos = htmlContent.find("{{tabs}}");
@@ -87,7 +118,7 @@ void FlameGraphGenerator::generateCombinedHtml(const std::vector<std::string> &f
         htmlContent.replace(contentPos, 11, content);
     }
 
-    std::ofstream outputFile("combined_fg.html");
+    std::ofstream outputFile(htmlFileName);
     outputFile << htmlContent;
     
     outputFile.close();
