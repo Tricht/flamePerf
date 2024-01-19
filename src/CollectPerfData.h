@@ -34,6 +34,8 @@ private:
     std::string execPerf(const std::string& command);
 
     void setProfilingType(CLIParser::ProfilingType type);
+
+    void recordProfiles(const std::set<CLIParser::ProfilingType>& types);
     
 };
 

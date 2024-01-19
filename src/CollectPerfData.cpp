@@ -196,46 +196,11 @@ std::string CollectPerfData::genFileName()
     return ss.str();
 }
 
-void CollectPerfData::recordAllProfiles()
-{
-    const std::array<CLIParser::ProfilingType, 4> allTypes = {
-        CLIParser::ProfilingType::CPU,
-        CLIParser::ProfilingType::OffCPU,
-        CLIParser::ProfilingType::Memory,
-        CLIParser::ProfilingType::IO        
-    };
-
-    std::vector<std::string> fgFileNames;
-
-    for (auto type : allTypes) {
-        setProfilingType(type);
-        recordPerf();
-        
-        std::string perfData = retriveData();
-        std::string profFileName = genFileName();
-
-        std::ofstream outFile(profFileName);
-        if (!outFile.is_open()) {
-            throw std::runtime_error("Unable to open file: " + profFileName);
-        }
-        outFile << perfData;
-        outFile.close();
-
-        //std::string fgFileName = profFileName + ".svg";
-        FlameGraphGenerator flameGraphGenerator(perfData, type);
-        flameGraphGenerator.generateFlameGraph(profFileName);  
-        fgFileNames.push_back(profFileName + ".svg");              
-    }
-
-    FlameGraphGenerator fgGenerator;
-    fgGenerator.generateCombinedHtml(fgFileNames);
-}
-
-void CollectPerfData::recordSelectedProfiles(const std::set<CLIParser::ProfilingType> &selectedTypes)
+void CollectPerfData::recordProfiles(const std::set<CLIParser::ProfilingType> &types)
 {
     std::vector<std::string> fgFileNames;
 
-    for (auto type : selectedTypes) {
+    for (auto type : types) {
         setProfilingType(type);
         recordPerf();
         
@@ -256,4 +221,21 @@ void CollectPerfData::recordSelectedProfiles(const std::set<CLIParser::Profiling
 
     FlameGraphGenerator fgGenerator;
     fgGenerator.generateCombinedHtml(fgFileNames);
+}
+
+void CollectPerfData::recordAllProfiles()
+{
+    std::set<CLIParser::ProfilingType> allTypes = {
+        CLIParser::ProfilingType::CPU,
+        CLIParser::ProfilingType::OffCPU,
+        CLIParser::ProfilingType::Memory,
+        CLIParser::ProfilingType::IO        
+    };
+
+    recordProfiles(allTypes);
+}
+
+void CollectPerfData::recordSelectedProfiles(const std::set<CLIParser::ProfilingType> &selectedTypes)
+{
+    recordProfiles(selectedTypes);  
 }
