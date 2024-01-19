@@ -21,6 +21,8 @@ public:
 
     void recordAllProfiles();
 
+    void recordSelectedProfiles(const std::set<CLIParser::ProfilingType>& selectedTypes);
+
 private:
     std::string options;
     pid_t perfPID;

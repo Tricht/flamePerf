@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
 class CLIParser
 {
@@ -12,13 +13,14 @@ public:
     enum class ProfilingType {CPU, OffCPU, Memory, IO, Default};
 
     void parseArgs();
-
     std::string getPerfOpts();
     int getDuration();
     ProfilingType getProfType() const;
     std::string getCmdToExecute() const;
     int getPidToRecord();
     bool shouldRecordAllProfiles() const;
+    void addProfilingType(ProfilingType type);
+    const std::set<ProfilingType>& getSelectedProfilingTypes() const;
 
 
 private:
@@ -30,6 +32,7 @@ private:
     std::string cmdToExecute;
     int pidToRecord;
     bool allProfiles;
+    std::set<ProfilingType> selectedProfilingTypes;
 
 };
 

@@ -208,8 +208,7 @@ void CollectPerfData::recordAllProfiles()
     std::vector<std::string> fgFileNames;
 
     for (auto type : allTypes) {
-        // setProfilingType(type);
-        profType = type;
+        setProfilingType(type);
         recordPerf();
         
         std::string perfData = retriveData();
@@ -226,6 +225,33 @@ void CollectPerfData::recordAllProfiles()
         FlameGraphGenerator flameGraphGenerator(perfData, type);
         flameGraphGenerator.generateFlameGraph(profFileName);  
         fgFileNames.push_back(profFileName + ".svg");              
+    }
+
+    FlameGraphGenerator fgGenerator;
+    fgGenerator.generateCombinedHtml(fgFileNames);
+}
+
+void CollectPerfData::recordSelectedProfiles(const std::set<CLIParser::ProfilingType> &selectedTypes)
+{
+    std::vector<std::string> fgFileNames;
+
+    for (auto type : selectedTypes) {
+        setProfilingType(type);
+        recordPerf();
+        
+        std::string perfData = retriveData();
+        std::string profFileName = genFileName();
+        
+        std::ofstream outFile(profFileName);
+        if (!outFile.is_open()) {
+            throw std::runtime_error("Unable to open file: " + profFileName);
+        }
+        outFile << perfData;
+        outFile.close();
+
+        FlameGraphGenerator flameGraphGenerator(perfData, type);
+        flameGraphGenerator.generateFlameGraph(profFileName);
+        fgFileNames.push_back(profFileName + ".svg");
     }
 
     FlameGraphGenerator fgGenerator;

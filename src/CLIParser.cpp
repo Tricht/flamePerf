@@ -1,5 +1,6 @@
 #include "CLIParser.h"
 #include <iostream>
+#include <sstream>
 
 CLIParser::CLIParser(int argc, char **argv)
 :argc(argc), argv(argv), perfOpts(""), duration(0), profType(ProfilingType::Default), cmdToExecute(""), pidToRecord(-1), allProfiles(false) {}
@@ -54,6 +55,25 @@ void CLIParser::parseArgs()
         } else if (arg == "--all-profiles") {
             allProfiles = true;
 
+        // record chosen profiles
+        } else if (arg == "--profile-types") {
+            std::string types = argv[++i];
+            std::istringstream typesStream(types);
+            std::string type;
+            while (std::getline(typesStream, type, ',')) {
+                if (type == "cpu") {
+                    addProfilingType(ProfilingType::CPU);
+                } else if (type == "offcpu") {
+                    addProfilingType(ProfilingType::OffCPU);
+                } else if (type == "mem") {
+                    addProfilingType(ProfilingType::Memory);
+                } else if (type == "io") {
+                    addProfilingType(ProfilingType::IO);
+                } else {
+                    std::cerr << "Invalid profiling type: " << type << std::endl;
+                }
+            }   
+
         // help message    
         } else {
             std::cout << "Usage: " << std::endl;
@@ -89,4 +109,14 @@ int CLIParser::getPidToRecord()
 bool CLIParser::shouldRecordAllProfiles() const
 {
     return allProfiles;
+}
+
+const std::set<CLIParser::ProfilingType> &CLIParser::getSelectedProfilingTypes() const
+{
+    return selectedProfilingTypes;
+}
+
+void CLIParser::addProfilingType(ProfilingType type)
+{
+    selectedProfilingTypes.insert(type);
 }
