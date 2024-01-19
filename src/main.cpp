@@ -1,10 +1,14 @@
 #include "CLIParser.h"
+
 #include "CollectPerfData.h"
+
 #include "FlameGraphGenerator.h"
+
 #include <iostream>
+
 #include <stdexcept>
 
-int main(int argc, char** argv) {
+int main(int argc, char ** argv) {
     try {
         CLIParser cliParser(argc, argv);
         cliParser.parseArgs();
@@ -28,7 +32,7 @@ int main(int argc, char** argv) {
         }
 
         std::cout << "Flamegraph(s) successfully generated" << std::endl;
-    } catch (const std::exception& e) {
+    } catch (const std::exception & e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;
     }

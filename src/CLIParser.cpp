@@ -1,32 +1,30 @@
 #include "CLIParser.h"
+
 #include <iostream>
+
 #include <sstream>
 
-CLIParser::CLIParser(int argc, char **argv)
-:argc(argc), argv(argv), perfOpts(""), duration(0), profType(ProfilingType::Default), cmdToExecute(""), pidToRecord(-1), allProfiles(false) {}
+CLIParser::CLIParser(int argc, char ** argv): argc(argc), argv(argv), perfOpts(""), duration(0), profType(ProfilingType::Default), cmdToExecute(""), pidToRecord(-1), allProfiles(false) {}
 
-void CLIParser::parseArgs()
-{
+void CLIParser::parseArgs() {
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
 
-        // options for perf
-        if (arg == "-o" || arg == "--perf-options") {
+        if (arg == "-o" || arg == "--perf-options") // options for perf
+        {
             perfOpts = argv[++i];
-
-        // how long should perf run    
-        } else if (arg == "-d" || arg == "--duration") {
+        } else if (arg == "-d" || arg == "--duration") // how long should perf run
+        {
             try {
                 duration = std::stoi(argv[++i]);
-            } catch (const std::invalid_argument& e) {
+            } catch (const std::invalid_argument & e) {
                 std::cerr << "Invalid duration value" << std::endl;
                 throw;
             }
-
-        //which profiling type should be used    
-        } else if (arg == "-p" || arg == "--profiling-type") {
+        } else if (arg == "-p" || arg == "--profiling-type") // which profiling type should be used
+        {
             std::string type = argv[++i];
-            if(type == "cpu") {
+            if (type == "cpu") {
                 profType = ProfilingType::CPU;
             } else if (type == "offcpu") {
                 profType = ProfilingType::OffCPU;
@@ -37,26 +35,22 @@ void CLIParser::parseArgs()
             } else {
                 std::cerr << "Invalid profiling type" << std::endl;
             }
-
-        // instead of duration, measure a command...    
-        } else if (arg == "-c" || arg == "--cmd") {
+        } else if (arg == "-c" || arg == "--cmd") // instead of duration, measure a command...
+        {
             cmdToExecute = argv[++i];
-
-        // ...or pid
-        } else if (arg == "--pid") {   
+        } else if (arg == "--pid") // ...or pid
+        {
             try {
                 pidToRecord = std::stoi(argv[++i]);
-            } catch (const std::invalid_argument& e) {
+            } catch (const std::invalid_argument & e) {
                 std::cerr << "Invalid pid value" << std::endl;
                 throw;
             }
-
-        // record all profiles
-        } else if (arg == "--all-profiles") {
+        } else if (arg == "--all-profiles") // record all profiles
+        {
             allProfiles = true;
-
-        // record chosen profiles
-        } else if (arg == "--profile-types") {
+        } else if (arg == "--profile-types") // record chosen profiles
+        {
             std::string types = argv[++i];
             std::istringstream typesStream(types);
             std::string type;
@@ -72,51 +66,42 @@ void CLIParser::parseArgs()
                 } else {
                     std::cerr << "Invalid profiling type: " << type << std::endl;
                 }
-            }   
-
-        // help message    
-        } else {
+            }
+        } else // help message
+        {
             std::cout << "Usage: " << std::endl;
         }
     }
 }
 
-std::string CLIParser::getPerfOpts()
-{
+std::string CLIParser::getPerfOpts() {
     return perfOpts;
 }
 
-int CLIParser::getDuration()
-{
+int CLIParser::getDuration() {
     return duration;
 }
 
-CLIParser::ProfilingType CLIParser::getProfType() const
-{
+CLIParser::ProfilingType CLIParser::getProfType() const {
     return profType;
 }
 
-std::string CLIParser::getCmdToExecute() const
-{
+std::string CLIParser::getCmdToExecute() const {
     return cmdToExecute;
 }
 
-int CLIParser::getPidToRecord()
-{
+int CLIParser::getPidToRecord() {
     return pidToRecord;
 }
 
-bool CLIParser::shouldRecordAllProfiles() const
-{
+bool CLIParser::shouldRecordAllProfiles() const {
     return allProfiles;
 }
 
-const std::set<CLIParser::ProfilingType> &CLIParser::getSelectedProfilingTypes() const
-{
+const std::set < CLIParser::ProfilingType > & CLIParser::getSelectedProfilingTypes() const {
     return selectedProfilingTypes;
 }
 
-void CLIParser::addProfilingType(ProfilingType type)
-{
+void CLIParser::addProfilingType(ProfilingType type) {
     selectedProfilingTypes.insert(type);
 }

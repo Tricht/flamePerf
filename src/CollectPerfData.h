@@ -5,10 +5,9 @@
 
 #include <string>
 
-class CollectPerfData
-{
-public: 
-    CollectPerfData(const std::string& options, int duration, CLIParser::ProfilingType profType, const std::string& cmd, int pidToRecord);
+class CollectPerfData {
+    public: CollectPerfData(const std::string & options, int duration, CLIParser::ProfilingType profType,
+        const std::string & cmd, int pidToRecord);
     // ~CollectPerfData();
 
     void recordPerf();
@@ -21,22 +20,20 @@ public:
 
     void recordAllProfiles();
 
-    void recordSelectedProfiles(const std::set<CLIParser::ProfilingType>& selectedTypes);
+    void recordSelectedProfiles(const std::set < CLIParser::ProfilingType > & selectedTypes);
 
-private:
-    std::string options;
+    private: std::string options;
     pid_t perfPID;
     int duration;
     CLIParser::ProfilingType profType;
     std::string cmdToExecute;
     int pidToRecord;
 
-    std::string execPerf(const std::string& command);
+    std::string execPerf(const std::string & command);
 
     void setProfilingType(CLIParser::ProfilingType type);
 
-    void recordProfiles(const std::set<CLIParser::ProfilingType>& types);
-    
+    void recordProfiles(const std::set < CLIParser::ProfilingType > & types);
 };
 
 #endif

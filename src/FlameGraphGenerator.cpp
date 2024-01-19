@@ -1,19 +1,24 @@
 #include "FlameGraphGenerator.h"
+
 #include <fstream>
+
 #include <array>
+
 #include <memory>
+
 #include <iostream>
+
 #include <sstream>
+
 #include <chrono>
+
 #include <iomanip>
 
 FlameGraphGenerator::FlameGraphGenerator() {}
 
-FlameGraphGenerator::FlameGraphGenerator(const std::string &perfData, CLIParser::ProfilingType profType)
-    : perfData(perfData), profType(profType) {}
+FlameGraphGenerator::FlameGraphGenerator(const std::string & perfData, CLIParser::ProfilingType profType): perfData(perfData), profType(profType) {}
 
-void FlameGraphGenerator::generateFlameGraph(const std::string &outputPath)
-{
+void FlameGraphGenerator::generateFlameGraph(const std::string & outputPath) {
     std::string collapsedData = collapseStack();
     std::cout << "Collapsed Data Length: " << collapsedData.length() << std::endl;
 
@@ -28,21 +33,20 @@ void FlameGraphGenerator::generateFlameGraph(const std::string &outputPath)
     tempOutFile.close();
 
     std::string colorPalette;
-    switch(profType) {
-        case CLIParser::ProfilingType::CPU:
-            colorPalette = "--color=java";
-            break;
-        case CLIParser::ProfilingType::OffCPU:
-            colorPalette = "--color=io";
-            break;
-        case CLIParser::ProfilingType::Memory:
-            colorPalette = "--color=mem";
-            break;
-        case CLIParser::ProfilingType::IO:
-            colorPalette = "--color=yellow";
-            break;             
-    
-}
+    switch (profType) {
+    case CLIParser::ProfilingType::CPU:
+        colorPalette = "--color=java";
+        break;
+    case CLIParser::ProfilingType::OffCPU:
+        colorPalette = "--color=io";
+        break;
+    case CLIParser::ProfilingType::Memory:
+        colorPalette = "--color=mem";
+        break;
+    case CLIParser::ProfilingType::IO:
+        colorPalette = "--color=yellow";
+        break;
+    }
 
     std::string flameGraphCmd = "perl ../FlameGraph/flamegraph.pl " + colorPalette + " " + tempCollOut + " > " + outputPath + ".svg";
 
@@ -57,14 +61,13 @@ void FlameGraphGenerator::generateFlameGraph(const std::string &outputPath)
     }
 }
 
-void FlameGraphGenerator::generateCombinedHtml(const std::vector<std::string> &fileNames)
-{
+void FlameGraphGenerator::generateCombinedHtml(const std::vector < std::string > & fileNames) {
     auto now = std::chrono::system_clock::now();
     auto now_c = std::chrono::system_clock::to_time_t(now);
     std::stringstream ss;
-    ss << "./results/flamegraphs_" << std::put_time(std::localtime(&now_c), "%d%m%Y_%H%M%S") << ".html";
+    ss << "./results/flamegraphs_" << std::put_time(std::localtime( & now_c), "%d%m%Y_%H%M%S") << ".html";
     std::string htmlFileName = ss.str();
-    
+
     std::ifstream templateFile("../utils/template.html");
     std::stringstream buffer;
     buffer << templateFile.rdbuf();
@@ -100,7 +103,7 @@ void FlameGraphGenerator::generateCombinedHtml(const std::vector<std::string> &f
         size_t onloadStart = svgCode.find("onload=\"init(evt)\"");
         if (onloadStart != std::string::npos) {
             svgCode.erase(onloadStart, std::string("onload=\"init(evt)\"").length());
-        } 
+        }
 
         size_t svgStart = svgCode.find("<svg");
         if (svgStart != std::string::npos) {
@@ -109,7 +112,7 @@ void FlameGraphGenerator::generateCombinedHtml(const std::vector<std::string> &f
 
         content += svgCode;
         content += "</div>";
-        
+
         /* std::ifstream svgFile(fileNames[i]);
         std::string svgCode((std::istreambuf_iterator<char>(svgFile)), std::istreambuf_iterator<char>());
         svgFile.close();
@@ -130,21 +133,20 @@ void FlameGraphGenerator::generateCombinedHtml(const std::vector<std::string> &f
 
     std::ofstream outputFile(htmlFileName);
     outputFile << htmlContent;
-    
+
     outputFile.close();
 }
 
-std::string FlameGraphGenerator::collapseStack()
-{
+std::string FlameGraphGenerator::collapseStack() {
     std::string collapseScriptPath;
 
-    switch(profType) {
-        case CLIParser::ProfilingType::OffCPU:
-            collapseScriptPath = "../FlameGraph/stackcollapse-perf.pl";
-            break;
-        default:
-            collapseScriptPath = "../FlameGraph/stackcollapse-perf.pl";
-            break;            
+    switch (profType) {
+    case CLIParser::ProfilingType::OffCPU:
+        collapseScriptPath = "../FlameGraph/stackcollapse-perf.pl";
+        break;
+    default:
+        collapseScriptPath = "../FlameGraph/stackcollapse-perf.pl";
+        break;
     }
 
     std::string tempPerfScript = "tempPerfScript.tmp";
@@ -161,9 +163,9 @@ std::string FlameGraphGenerator::collapseStack()
 
     std::cout << cmd << std::endl;
 
-    std::array<char, 128> buffer;
+    std::array < char, 128 > buffer;
     std::string result;
-    std::shared_ptr<FILE> pipe(popen(cmd.c_str(), "r"), pclose);
+    std::shared_ptr < FILE > pipe(popen(cmd.c_str(), "r"), pclose);
     if (!pipe) {
         throw std::runtime_error("popen() failed");
     }
@@ -175,8 +177,8 @@ std::string FlameGraphGenerator::collapseStack()
     }
 
     if (remove(tempPerfScript.c_str()) != 0) {
-    std::cerr << "Warning: Failed to delete temp perf data file" << std::endl;
-}
+        std::cerr << "Warning: Failed to delete temp perf data file" << std::endl;
+    }
 
-    return result; 
+    return result;
 }
