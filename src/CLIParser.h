@@ -23,12 +23,12 @@ class CLIParser {
  private:
   int argc;
   char** argv;
-  std::string perfOpts;
-  int duration;
-  ProfilingType profType;
-  std::string cmdToExecute;
-  int pidToRecord;
-  bool allProfiles;
+  std::string perfOpts = "";
+  int duration = 0;
+  ProfilingType profType = ProfilingType::Default;
+  std::string cmdToExecute = "";
+  int pidToRecord = -1;
+  bool allProfiles = false;
   std::set<ProfilingType> selectedProfilingTypes;
 };
 

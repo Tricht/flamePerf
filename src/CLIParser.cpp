@@ -4,7 +4,7 @@
 
 #include <sstream>
 
-CLIParser::CLIParser(int argc, char ** argv): argc(argc), argv(argv), perfOpts(""), duration(0), profType(ProfilingType::Default), cmdToExecute(""), pidToRecord(-1), allProfiles(false) {}
+CLIParser::CLIParser(int argc, char ** argv): argc(argc), argv(argv) {}
 
 void CLIParser::parseArgs() {
     for (int i = 1; i < argc; ++i) {
