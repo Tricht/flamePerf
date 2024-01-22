@@ -52,8 +52,7 @@ void CollectPerfData::recordPerf() {
 
     int status = system(perfCommand.c_str());
     if (status != 0) {
-        std::cerr << "Failed to execute perf record: " << status << std::endl;
-        exit(1);
+        throw std::runtime_error("Failed to execute perf record: " + status);
     }
 
     /*     std::future<void> collectFuture = std::async(std::launch::async, [this]() {
@@ -125,16 +124,16 @@ void CollectPerfData::setProfilingType(CLIParser::ProfilingType type) {
     profType = type;
     switch (type) {
     case CLIParser::ProfilingType::CPU:
-        options = "-F 99 -e cycles -ag";
+        options = "-F 99 -e cpu-clock -e cycles -ag";
         break;
     case CLIParser::ProfilingType::OffCPU:
         options = "-F 99 -e sched:sched_stat_sleep -e sched:sched_switch -e sched:sched_process_exit -ag";
         break;
     case CLIParser::ProfilingType::Memory:
-        options = "-F 99 -e cache-misses,cache-references -ag";
+        options = "-F 99 -e cache-misses -e cache-references -ag";
         break;
     case CLIParser::ProfilingType::IO:
-        options = "-F 99 -e block:block_rq_issue -ag";
+        options = "-F 99 -e syscalls:sys_enter_read -e syscalls:sys_enter_write -ag";
         break;
     case CLIParser::ProfilingType::Default:
         options = "-F 99 -ag";
