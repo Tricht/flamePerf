@@ -8,7 +8,7 @@
 class CLIParser {
  public:
   CLIParser(int argc, char** argv);
-  enum class ProfilingType { CPU, OffCPU, Memory, IO, Default };
+  enum class ProfilingType { CPU, OffCPU, Memory, IO, Network, Default };
 
   void parseArgs();
   std::string getPerfOpts();

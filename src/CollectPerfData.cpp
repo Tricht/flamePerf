@@ -135,6 +135,9 @@ void CollectPerfData::setProfilingType(CLIParser::ProfilingType type) {
     case CLIParser::ProfilingType::IO:
         options = "-F 99 -e syscalls:sys_enter_read -e syscalls:sys_enter_write -ag";
         break;
+    case CLIParser::ProfilingType::Network:
+        options = "-F 99 -e net:net_dev_queue -e net:net_dev_xmit -e tcp:tcp_retransmit_skb -e sock:inet_sock_set_state -ag";
+        break;    
     case CLIParser::ProfilingType::Default:
         options = "-F 99 -ag";
         break;
@@ -163,6 +166,9 @@ std::string CollectPerfData::genFileName() {
     case CLIParser::ProfilingType::IO:
         ss << "_IO";
         break;
+    case CLIParser::ProfilingType::Network:
+        ss << "_Net";
+        break;        
 
     default:
         ss << "";
@@ -213,7 +219,8 @@ void CollectPerfData::recordAllProfiles() {
         CLIParser::ProfilingType::CPU,
         CLIParser::ProfilingType::OffCPU,
         CLIParser::ProfilingType::Memory,
-        CLIParser::ProfilingType::IO
+        CLIParser::ProfilingType::IO,
+        CLIParser::ProfilingType::Network
     };
 
     recordProfiles(allTypes);

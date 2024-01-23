@@ -63,6 +63,8 @@ void CLIParser::parseArgs() {
                     addProfilingType(ProfilingType::Memory);
                 } else if (type == "io") {
                     addProfilingType(ProfilingType::IO);
+                } else if (type == "net") {
+                    addProfilingType(ProfilingType::Network);                    
                 } else {
                     std::cerr << "Invalid profiling type: " << type << std::endl;
                 }
