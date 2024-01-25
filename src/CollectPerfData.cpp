@@ -93,9 +93,10 @@ void CollectPerfData::initialize() {
 }
 
 std::string CollectPerfData::execPerf(const std::string & command) {
-    std::array < char, 1024 > buffer;
+    std::array <char, 1024> buffer;
     std::string result;
-    std::shared_ptr < FILE > pipe(popen(command.c_str(), "r"), pclose);
+    std::shared_ptr <FILE> pipe(popen(command.c_str(), "r"), pclose);
+    
     if (!pipe) {
         throw std::runtime_error("popen() failed!");
     }
@@ -110,7 +111,7 @@ std::string CollectPerfData::execPerf(const std::string & command) {
 }
 
 void CollectPerfData::setProfilingType(CLIParser::ProfilingType type) {
-    profType = type;
+    /* profType = type;
     switch (type) {
     case CLIParser::ProfilingType::CPU:
         options = "-F 99 -e cpu-clock -e cycles -ag";
@@ -133,7 +134,17 @@ void CollectPerfData::setProfilingType(CLIParser::ProfilingType type) {
     default:
         options = "-F 99 -ag";
         break;
+    } */
+    profType = type;
+    auto filteredEvents = getFilteredEventsForType(type);
+
+    options.clear();
+    for (const auto& event : filteredEvents) {
+        options += "-e " + event + " ";
     }
+
+    // Füge weitere allgemeine Optionen hinzu
+    options += "-F 99 -ag";
 }
 
 std::string CollectPerfData::genFileName() {
@@ -217,4 +228,61 @@ void CollectPerfData::recordAllProfiles() {
 
 void CollectPerfData::recordSelectedProfiles(const std::set < CLIParser::ProfilingType > & selectedTypes) {
     recordProfiles(selectedTypes);
+}
+
+std::set<std::string> CollectPerfData::getAvailablePerfEvents()
+{
+    std::set<std::string> events;
+    std::array<char, 1024> buffer;
+    std::string command = "perf list";
+    std::shared_ptr<FILE> pipe(popen(command.c_str(), "r"), pclose);
+
+    if (!pipe) {
+        throw std::runtime_error("popen() failed!");
+    }
+
+    while (!feof(pipe.get())) {
+        if (fgets(buffer.data(), 128, pipe.get()) != nullptr) {
+            std::string line = buffer.data();
+            auto pos = line.find('[');
+            if (pos != std::string::npos) {
+                std::string event = line.substr(0, pos);
+                event.erase(event.find_last_not_of(" \n\r\t") + 1);
+                events.insert(event);
+            }
+        }
+    }
+
+    return events;
+}
+
+void CollectPerfData::initializeOptimalEvents()
+{
+    optimalEventsForProfiles[CLIParser::ProfilingType::CPU] = {"cpu-clock", "cycles"};
+    optimalEventsForProfiles[CLIParser::ProfilingType::OffCPU] = {"sched:sched_stat_sleep", "sched:sched_switch", "sched:sched_process_exit"};
+    optimalEventsForProfiles[CLIParser::ProfilingType::Memory] = {"cache-misses", "cache-references"};
+    optimalEventsForProfiles[CLIParser::ProfilingType::IO] = {"syscalls:sys_enter_read", "syscalls:sys_enter_write"};
+    optimalEventsForProfiles[CLIParser::ProfilingType::Network] = {"net:net_dev_queue", "net:net_dev_xmit", "tcp:tcp_retransmit_skb", "sock:inet_sock_set_state"};
+}
+
+std::set<std::string> CollectPerfData::getFilteredEventsForType(CLIParser::ProfilingType type)
+{
+    auto availableEvents = getAvailablePerfEvents();
+    for(auto event : availableEvents) {
+        std::cout << event << std::endl;
+    }
+    auto& optimalEvents = optimalEventsForProfiles[type];
+    for(auto event : optimalEvents) {
+        std::cout << event << std::endl;
+    }
+    std::set<std::string> filteredEvents;
+
+
+    for (const auto& event : optimalEvents) {
+        if (availableEvents.find(event) != availableEvents.end()) {
+            filteredEvents.insert(event);
+        }
+    }
+
+    return filteredEvents;
 }

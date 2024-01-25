@@ -7,6 +7,7 @@
 
 #include "CLIParser.h"
 #include <string>
+#include <map>
 
 // CollectPerfData class provides functions to record, convert and store perf data
 class CollectPerfData {
@@ -40,6 +41,7 @@ class CollectPerfData {
     CLIParser::ProfilingType profType;
     std::string cmdToExecute;
     int pidToRecord;
+    std::map<CLIParser::ProfilingType, std::set<std::string>> optimalEventsForProfiles;
 
     // executes a system command, should be used for perf cmds
     std::string execPerf(const std::string & command);
@@ -49,6 +51,15 @@ class CollectPerfData {
 
     // records and retrieves perf data for the set of selected Profiling Types
     void recordProfiles(const std::set < CLIParser::ProfilingType > & types);
+
+    // collect available perf events on system
+    static std::set<std::string> getAvailablePerfEvents();
+    
+    // create lists with optimal events for every profiling type
+    void initializeOptimalEvents();
+
+    // adjust profile types to only collect the avaiable perf events
+    std::set<std::string> getFilteredEventsForType(CLIParser::ProfilingType type);
 };
 
 #endif
