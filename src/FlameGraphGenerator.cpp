@@ -112,13 +112,6 @@ void FlameGraphGenerator::generateCombinedHtml(const std::vector < std::string >
 
         content += svgCode;
         content += "</div>";
-
-        /* std::ifstream svgFile(fileNames[i]);
-        std::string svgCode((std::istreambuf_iterator<char>(svgFile)), std::istreambuf_iterator<char>());
-        svgFile.close();
-
-        content += svgCode;
-        content += "</div>"; */
     }
 
     size_t tabsPos = htmlContent.find("{{tabs}}");

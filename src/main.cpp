@@ -10,17 +10,22 @@
 
 int main(int argc, char ** argv) {
     try {
+        // parse cli arguments
         CLIParser cliParser(argc, argv);
         cliParser.parseArgs();
 
+        // create perf data collector with arguments parsed from cli
         CollectPerfData perfDataCollector(cliParser.getPerfOpts(), cliParser.getDuration(), cliParser.getProfType(), cliParser.getCmdToExecute(), cliParser.getPidToRecord());
+        // create results directory
         perfDataCollector.initialize();
 
+        // record all profiles if flag is set
         if (cliParser.shouldRecordAllProfiles()) {
-            perfDataCollector.recordAllProfiles();
+            perfDataCollector.recordAllProfiles();    
         } else {
             auto selectedTypes = cliParser.getSelectedProfilingTypes();
-            if (!selectedTypes.empty()) {
+            // if profile type and manually options are given, manually options are prioritized
+            if (!selectedTypes.empty() && cliParser.getPerfOpts().empty()) {
                 perfDataCollector.recordSelectedProfiles(selectedTypes);
             } else {
                 perfDataCollector.recordPerf();

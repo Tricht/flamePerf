@@ -1,46 +1,35 @@
 #include "CollectPerfData.h"
-
 #include <array>
-
 #include <memory>
-
 #include <stdexcept>
-
 #include <unistd.h>
-
 #include <csignal>
-
 #include <sys/wait.h>
-
 #include <chrono>
-
 #include <future>
-
 #include <iostream>
-
 #include <fstream>
-
 #include <sys/stat.h>
-
 #include <sstream>
-
 #include <iomanip>
-
 #include <algorithm>
-
 #include "FlameGraphGenerator.h"
 
 CollectPerfData::CollectPerfData(const std::string & options, int duration, CLIParser::ProfilingType profType,
     const std::string & cmd, int pidToRecord): options(options), duration(duration), profType(profType), cmdToExecute(cmd), pidToRecord(pidToRecord) {}
 
 void CollectPerfData::recordPerf() {
-    std::cout << static_cast < std::underlying_type < CLIParser::ProfilingType > ::type > (profType) << std::endl;
 
-    setProfilingType(profType);
+    std::string perfCommand = "perf record ";
 
-    std::cout << options << std::endl;
+    if (!options.empty()) {
+        perfCommand += options;
+    } else {
+        setProfilingType(profType);
+        perfCommand += options;
+    }
 
-    std::string perfCommand = "perf record " + options;
+    std::cout << options << std::endl; // debug msg to see which options are recorded
 
     if (!cmdToExecute.empty()) {
         perfCommand += " -- " + cmdToExecute;
