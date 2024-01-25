@@ -1,3 +1,7 @@
+// CLIParser.h
+// Defines the CLIParser class which is responsible for parsing 
+// command-line arguments for the flamePerf framework.
+
 #ifndef CLI_PARSER_H
 #define CLI_PARSER_H
 
@@ -5,19 +9,40 @@
 #include <string>
 #include <vector>
 
+// CLIParser class provides functions to parse and store cli arguments
 class CLIParser {
  public:
+  // Constructor: initializes the parser
   CLIParser(int argc, char** argv);
+
+  // enum to represent the different Profiling Types
   enum class ProfilingType { CPU, OffCPU, Memory, IO, Network, Default };
 
+  // Parses the cli arguments and sets flags/values.
   void parseArgs();
+
+  // Returns the options for perf record
   std::string getPerfOpts();
+
+  // Returns the duration for which perf record should run
   int getDuration();
+
+  // Returns the selected Profiling Type
   ProfilingType getProfType() const;
+
+  // Returns the command that should be executed and recorded
   std::string getCmdToExecute() const;
+
+  // Returns the pid that should be executed and recorded
   int getPidToRecord();
+
+  // Checks if all available Profiling Types should be recorded
   bool shouldRecordAllProfiles() const;
+
+  // Adds a Profiling Type to the set of selected types
   void addProfilingType(ProfilingType type);
+
+  // Returns the set of selected types
   const std::set<ProfilingType>& getSelectedProfilingTypes() const;
 
  private:

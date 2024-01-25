@@ -1,16 +1,18 @@
+// CLIParser.cpp
+// Implements the CLIParser class methods defined in CLIParser.h.
+
 #include "CLIParser.h"
-
 #include <iostream>
-
 #include <sstream>
+
 
 CLIParser::CLIParser(int argc, char ** argv): argc(argc), argv(argv) {}
 
 void CLIParser::parseArgs() {
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
-
-        if (arg == "-o" || arg == "--perf-options") // options for perf
+        // Handling different cli options
+        if (arg == "-o" || arg == "--perf-options") // options for perf command
         {
             perfOpts = argv[++i];
         } else if (arg == "-d" || arg == "--duration") // how long should perf run
@@ -20,20 +22,6 @@ void CLIParser::parseArgs() {
             } catch (const std::invalid_argument & e) {
                 std::cerr << "Invalid duration value" << std::endl;
                 throw;
-            }
-        } else if (arg == "-p" || arg == "--profiling-type") // which profiling type should be used
-        {
-            std::string type = argv[++i];
-            if (type == "cpu") {
-                profType = ProfilingType::CPU;
-            } else if (type == "offcpu") {
-                profType = ProfilingType::OffCPU;
-            } else if (type == "mem") {
-                profType = ProfilingType::Memory;
-            } else if (type == "io") {
-                profType = ProfilingType::IO;
-            } else {
-                std::cerr << "Invalid profiling type" << std::endl;
             }
         } else if (arg == "-c" || arg == "--cmd") // instead of duration, measure a command...
         {
@@ -49,7 +37,7 @@ void CLIParser::parseArgs() {
         } else if (arg == "--all-profiles") // record all profiles
         {
             allProfiles = true;
-        } else if (arg == "--profile-types") // record chosen profiles
+        } else if (arg == "-p" || arg == "--profile-types") // record chosen profiles
         {
             std::string types = argv[++i];
             std::istringstream typesStream(types);
