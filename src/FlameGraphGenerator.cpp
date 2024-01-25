@@ -46,6 +46,9 @@ void FlameGraphGenerator::generateFlameGraph(const std::string & outputPath) {
     case CLIParser::ProfilingType::IO:
         colorPalette = "--color=yellow";
         break;
+    case CLIParser::ProfilingType::Network:
+        colorPalette = "--color=aqua";
+        break;    
     }
 
     std::string flameGraphCmd = "perl ../FlameGraph/flamegraph.pl " + colorPalette + " " + tempCollOut + " > " + outputPath + ".svg";
