@@ -256,10 +256,24 @@ std::set<std::string> CollectPerfData::getAvailablePerfEvents()
             if (pos != std::string::npos)
             {
                 std::string event = line.substr(0, pos);
+                // delete "whitespace" chars
                 event.erase(0, event.find_first_not_of(" \n\r\t"));
                 event.erase(event.find_last_not_of(" \n\r\t") + 1);
                 events.insert(event);
-            }
+
+                // handle 'OR' in event names
+                auto orPos = event.find(" OR ");
+                if (orPos != std::string::npos) {
+                    // split string into two events
+                    std::string event1 = event.substr(0, orPos);
+                    std::string event2 = event.substr(orPos + 4);
+
+                    events.insert(event1);
+                    events.insert(event2);
+                } else {
+                    events.insert(event);
+                }
+            }            
         }
     }
 
