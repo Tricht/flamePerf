@@ -282,11 +282,11 @@ std::set<std::string> CollectPerfData::getAvailablePerfEvents()
 
 void CollectPerfData::initializeOptimalEvents()
 {
-    optimalEventsForProfiles[CLIParser::ProfilingType::CPU] = {"cpu-clock", "cycles"};
-    optimalEventsForProfiles[CLIParser::ProfilingType::OffCPU] = {"sched:sched_stat_sleep", "sched:sched_switch", "sched:sched_process_exit"};
-    optimalEventsForProfiles[CLIParser::ProfilingType::Memory] = {"cache-misses", "cache-references"};
-    optimalEventsForProfiles[CLIParser::ProfilingType::IO] = {"syscalls:sys_enter_read", "syscalls:sys_enter_write"};
-    optimalEventsForProfiles[CLIParser::ProfilingType::Network] = {"net:net_dev_queue", "net:net_dev_xmit", "tcp:tcp_retransmit_skb", "sock:inet_sock_set_state"};
+    optimalEventsForProfiles[CLIParser::ProfilingType::CPU] = {"cpu-clock", "cycles", "instructions"};
+    optimalEventsForProfiles[CLIParser::ProfilingType::OffCPU] = {"sched:sched_stat_sleep", "sched:sched_switch", "sched:sched_process_exit", "sched:sched_wakeup"};
+    optimalEventsForProfiles[CLIParser::ProfilingType::Memory] = {"cache-misses", "cache-references", "page-faults"};
+    optimalEventsForProfiles[CLIParser::ProfilingType::IO] = {"syscalls:sys_enter_read", "syscalls:sys_enter_write", "block:block_rq_issue", "block:block_rq_complete"};
+    optimalEventsForProfiles[CLIParser::ProfilingType::Network] = {"net:net_dev_queue", "net:net_dev_xmit", "tcp:tcp_retransmit_skb", "sock:inet_sock_set_state", "udp:udp_*"};
 }
 
 std::set<std::string> CollectPerfData::getFilteredEventsForType(CLIParser::ProfilingType type)
