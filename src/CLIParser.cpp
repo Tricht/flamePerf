@@ -5,93 +5,147 @@
 #include <iostream>
 #include <sstream>
 
+CLIParser::CLIParser(int argc, char **argv) : argc(argc), argv(argv) {}
 
-CLIParser::CLIParser(int argc, char ** argv): argc(argc), argv(argv) {}
-
-void CLIParser::parseArgs() {
-    for (int i = 1; i < argc; ++i) {
+void CLIParser::parseArgs()
+{
+    for (int i = 1; i < argc; ++i)
+    {
         std::string arg = argv[i];
         // Handling different cli options
-        if (arg == "-o" || arg == "--perf-options") // options for perf command
+        if (arg == "--diff") // create a diff graph
+        {
+            diffFlag = true;
+            diffFile1 = argv[++i];
+            diffFile2 = argv[++i];
+        }
+        else if (arg == "-o" || arg == "--perf-options") // options for perf command
         {
             perfOpts = argv[++i];
-        } else if (arg == "-d" || arg == "--duration") // how long should perf run
+        }
+        else if (arg == "-d" || arg == "--duration") // how long should perf run
         {
-            try {
+            try
+            {
                 duration = std::stoi(argv[++i]);
-            } catch (const std::invalid_argument & e) {
+            }
+            catch (const std::invalid_argument &e)
+            {
                 std::cerr << "Invalid duration value" << std::endl;
                 throw;
             }
-        } else if (arg == "-c" || arg == "--cmd") // instead of duration, measure a command...
+        }
+        else if (arg == "-c" || arg == "--cmd") // instead of duration, measure a command...
         {
             cmdToExecute = argv[++i];
-        } else if (arg == "--pid") // ...or pid
+        }
+        else if (arg == "--pid") // ...or pid
         {
-            try {
+            try
+            {
                 pidToRecord = std::stoi(argv[++i]);
-            } catch (const std::invalid_argument & e) {
+            }
+            catch (const std::invalid_argument &e)
+            {
                 std::cerr << "Invalid pid value" << std::endl;
                 throw;
             }
-        } else if (arg == "--all-profiles") // record all profiles
+        }
+        else if (arg == "--all-profiles") // record all profiles
         {
             allProfiles = true;
-        } else if (arg == "-p" || arg == "--profile-types") // record chosen profiles
+        }
+        else if (arg == "-p" || arg == "--profile-types") // record chosen profiles
         {
             std::string types = argv[++i];
             std::istringstream typesStream(types);
             std::string type;
-            while (std::getline(typesStream, type, ',')) {
-                if (type == "cpu") {
+            while (std::getline(typesStream, type, ','))
+            {
+                if (type == "cpu")
+                {
                     addProfilingType(ProfilingType::CPU);
-                } else if (type == "offcpu") {
+                }
+                else if (type == "offcpu")
+                {
                     addProfilingType(ProfilingType::OffCPU);
-                } else if (type == "mem") {
+                }
+                else if (type == "mem")
+                {
                     addProfilingType(ProfilingType::Memory);
-                } else if (type == "io") {
+                }
+                else if (type == "io")
+                {
                     addProfilingType(ProfilingType::IO);
-                } else if (type == "net") {
-                    addProfilingType(ProfilingType::Network);                    
-                } else {
+                }
+                else if (type == "net")
+                {
+                    addProfilingType(ProfilingType::Network);
+                }
+                else
+                {
                     std::cerr << "Invalid profiling type: " << type << std::endl;
                 }
             }
-        } else // help message
+        }
+        else // help message
         {
             std::cout << "Usage: " << std::endl;
         }
     }
 }
 
-std::string CLIParser::getPerfOpts() {
+std::string CLIParser::getPerfOpts()
+{
     return perfOpts;
 }
 
-int CLIParser::getDuration() {
+int CLIParser::getDuration()
+{
     return duration;
 }
 
-CLIParser::ProfilingType CLIParser::getProfType() const {
+CLIParser::ProfilingType CLIParser::getProfType() const
+{
     return profType;
 }
 
-std::string CLIParser::getCmdToExecute() const {
+std::string CLIParser::getCmdToExecute() const
+{
     return cmdToExecute;
 }
 
-int CLIParser::getPidToRecord() {
+int CLIParser::getPidToRecord()
+{
     return pidToRecord;
 }
 
-bool CLIParser::shouldRecordAllProfiles() const {
+bool CLIParser::shouldRecordAllProfiles() const
+{
     return allProfiles;
 }
 
-const std::set < CLIParser::ProfilingType > & CLIParser::getSelectedProfilingTypes() const {
+const std::set<CLIParser::ProfilingType> &CLIParser::getSelectedProfilingTypes() const
+{
     return selectedProfilingTypes;
 }
 
-void CLIParser::addProfilingType(ProfilingType type) {
+void CLIParser::addProfilingType(ProfilingType type)
+{
     selectedProfilingTypes.insert(type);
+}
+
+bool CLIParser::shouldCreateDiffGraph() const
+{
+    return diffFlag;
+}
+
+std::string CLIParser::getDiffFile1() const
+{
+    return diffFile1;
+}
+
+std::string CLIParser::getDiffFile2() const
+{
+    return diffFile2;
 }

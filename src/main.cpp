@@ -8,8 +8,10 @@
 
 #include <stdexcept>
 
-int main(int argc, char ** argv) {
-    try {
+int main(int argc, char **argv)
+{
+    try
+    {
         // parse cli arguments
         CLIParser cliParser(argc, argv);
         cliParser.parseArgs();
@@ -19,15 +21,28 @@ int main(int argc, char ** argv) {
         // create results directory
         perfDataCollector.initialize();
 
+        // create diff graph if flag is set
+        if (cliParser.shouldCreateDiffGraph())
+        {
+            FlameGraphGenerator flameGraphGenerator;
+            std::string fileName = perfDataCollector.genFileName();
+            flameGraphGenerator.generateDiffFlameGraph(cliParser.getDiffFile1(), cliParser.getDiffFile2(), fileName);
+        }
         // record all profiles if flag is set
-        if (cliParser.shouldRecordAllProfiles()) {
-            perfDataCollector.recordAllProfiles();    
-        } else {
+        else if (cliParser.shouldRecordAllProfiles())
+        {
+            perfDataCollector.recordAllProfiles();
+        }
+        else
+        {
             auto selectedTypes = cliParser.getSelectedProfilingTypes();
             // if profile type and manually options are given, manually options are prioritized
-            if (!selectedTypes.empty() && cliParser.getPerfOpts().empty()) {
+            if (!selectedTypes.empty() && cliParser.getPerfOpts().empty())
+            {
                 perfDataCollector.recordSelectedProfiles(selectedTypes);
-            } else {
+            }
+            else
+            {
                 perfDataCollector.recordPerf();
                 std::string perfData = perfDataCollector.retriveData();
                 std::string fgName = perfDataCollector.genFileName();
@@ -37,7 +52,9 @@ int main(int argc, char ** argv) {
         }
 
         std::cout << "Flamegraph(s) successfully generated" << std::endl;
-    } catch (const std::exception & e) {
+    }
+    catch (const std::exception &e)
+    {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;
     }

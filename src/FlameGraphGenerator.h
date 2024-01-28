@@ -5,16 +5,21 @@
 
 #include "CLIParser.h"
 
-class FlameGraphGenerator {
-    public: FlameGraphGenerator();
+class FlameGraphGenerator
+{
+public:
+    FlameGraphGenerator();
 
-    FlameGraphGenerator(const std::string & perfData, CLIParser::ProfilingType profType);
+    FlameGraphGenerator(const std::string &perfData, CLIParser::ProfilingType profType);
 
-    void generateFlameGraph(const std::string & outputPath);
+    void generateFlameGraph(const std::string &outputPath);
 
-    void generateCombinedHtml(const std::vector < std::string > & fileNames);
+    void generateCombinedHtml(const std::vector<std::string> &fileNames);
 
-    private: std::string perfData;
+    void generateDiffFlameGraph(const std::string &file1, const std::string &file2, const std::string &outputPath);
+
+private:
+    std::string perfData;
     CLIParser::ProfilingType profType;
 
     std::string collapseStack();

@@ -1,5 +1,5 @@
 // CLIParser.h
-// Defines the CLIParser class which is responsible for parsing 
+// Defines the CLIParser class which is responsible for parsing
 // command-line arguments for the flamePerf framework.
 
 #ifndef CLI_PARSER_H
@@ -10,13 +10,22 @@
 #include <vector>
 
 // CLIParser class provides functions to parse and store cli arguments
-class CLIParser {
- public:
+class CLIParser
+{
+public:
   // Constructor: initializes the parser
-  CLIParser(int argc, char** argv);
+  CLIParser(int argc, char **argv);
 
   // enum to represent the different Profiling Types
-  enum class ProfilingType { CPU, OffCPU, Memory, IO, Network, Default };
+  enum class ProfilingType
+  {
+    CPU,
+    OffCPU,
+    Memory,
+    IO,
+    Network,
+    Default
+  };
 
   // Parses the cli arguments and sets flags/values.
   void parseArgs();
@@ -43,11 +52,20 @@ class CLIParser {
   void addProfilingType(ProfilingType type);
 
   // Returns the set of selected types
-  const std::set<ProfilingType>& getSelectedProfilingTypes() const;
+  const std::set<ProfilingType> &getSelectedProfilingTypes() const;
 
- private:
+  // Cheks if a differential Flamegraph should be created
+  bool shouldCreateDiffGraph() const;
+
+  // Get first diff file
+  std::string getDiffFile1() const;
+
+  // Get second diff file
+  std::string getDiffFile2() const;
+
+private:
   int argc;
-  char** argv;
+  char **argv;
   std::string perfOpts = "";
   int duration = 0;
   ProfilingType profType = ProfilingType::Default;
@@ -55,6 +73,8 @@ class CLIParser {
   int pidToRecord = -1;
   bool allProfiles = false;
   std::set<ProfilingType> selectedProfilingTypes;
+  bool diffFlag = false;
+  std::string diffFile1, diffFile2;
 };
 
 #endif

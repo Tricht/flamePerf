@@ -16,16 +16,18 @@
 
 FlameGraphGenerator::FlameGraphGenerator() {}
 
-FlameGraphGenerator::FlameGraphGenerator(const std::string & perfData, CLIParser::ProfilingType profType): perfData(perfData), profType(profType) {}
+FlameGraphGenerator::FlameGraphGenerator(const std::string &perfData, CLIParser::ProfilingType profType) : perfData(perfData), profType(profType) {}
 
-void FlameGraphGenerator::generateFlameGraph(const std::string & outputPath) {
+void FlameGraphGenerator::generateFlameGraph(const std::string &outputPath)
+{
     std::string collapsedData = collapseStack();
     std::cout << "Collapsed Data Length: " << collapsedData.length() << std::endl;
 
     std::string tempCollOut = "tempCollOut.tmp";
 
     std::ofstream tempOutFile(tempCollOut);
-    if (!tempOutFile.is_open()) {
+    if (!tempOutFile.is_open())
+    {
         throw std::runtime_error("Unable to open temp file");
     }
 
@@ -33,7 +35,8 @@ void FlameGraphGenerator::generateFlameGraph(const std::string & outputPath) {
     tempOutFile.close();
 
     std::string colorPalette;
-    switch (profType) {
+    switch (profType)
+    {
     case CLIParser::ProfilingType::CPU:
         colorPalette = "--color=java";
         break;
@@ -48,27 +51,30 @@ void FlameGraphGenerator::generateFlameGraph(const std::string & outputPath) {
         break;
     case CLIParser::ProfilingType::Network:
         colorPalette = "--color=aqua";
-        break;    
+        break;
     }
 
     std::string flameGraphCmd = "perl ../FlameGraph/flamegraph.pl " + colorPalette + " " + tempCollOut + " > " + outputPath + ".svg";
 
     int result = system(flameGraphCmd.c_str());
-    if (result != 0) {
+    if (result != 0)
+    {
         std::cerr << "FlameGraph Command: " << flameGraphCmd << std::endl;
         throw std::runtime_error("Failed to generate flamegraph");
     }
 
-    if (remove(tempCollOut.c_str()) != 0) {
+    if (remove(tempCollOut.c_str()) != 0)
+    {
         std::cerr << "Failed to delete temp file" << std::endl;
     }
 }
 
-void FlameGraphGenerator::generateCombinedHtml(const std::vector < std::string > & fileNames) {
+void FlameGraphGenerator::generateCombinedHtml(const std::vector<std::string> &fileNames)
+{
     auto now = std::chrono::system_clock::now();
     auto now_c = std::chrono::system_clock::to_time_t(now);
     std::stringstream ss;
-    ss << "./results/flamegraphs_" << std::put_time(std::localtime( & now_c), "%d%m%Y_%H%M%S") << ".html";
+    ss << "./results/flamegraphs_" << std::put_time(std::localtime(&now_c), "%d%m%Y_%H%M%S") << ".html";
     std::string htmlFileName = ss.str();
 
     std::ifstream templateFile("../utils/template.html");
@@ -79,7 +85,8 @@ void FlameGraphGenerator::generateCombinedHtml(const std::vector < std::string >
 
     std::string tabs, content;
 
-    for (size_t i = 0; i < fileNames.size(); ++i) {
+    for (size_t i = 0; i < fileNames.size(); ++i)
+    {
         // naming for tabs
         size_t lastSlash = fileNames[i].find_last_of("/\\");
         std::string fileName = (lastSlash != std::string::npos) ? fileNames[i].substr(lastSlash + 1) : fileNames[i];
@@ -88,7 +95,8 @@ void FlameGraphGenerator::generateCombinedHtml(const std::vector < std::string >
 
         // edit path of svg files
         std::string svgFilePath = fileNames[i];
-        if (lastSlash != std::string::npos) {
+        if (lastSlash != std::string::npos)
+        {
             svgFilePath = svgFilePath.substr(lastSlash + 1);
         }
 
@@ -100,12 +108,14 @@ void FlameGraphGenerator::generateCombinedHtml(const std::vector < std::string >
     }
 
     size_t tabsPos = htmlContent.find("{{tabs}}");
-    if (tabsPos != std::string::npos) {
+    if (tabsPos != std::string::npos)
+    {
         htmlContent.replace(tabsPos, 8, tabs);
     }
 
     size_t contentPos = htmlContent.find("{{content}}");
-    if (contentPos != std::string::npos) {
+    if (contentPos != std::string::npos)
+    {
         htmlContent.replace(contentPos, 11, content);
     }
 
@@ -115,10 +125,12 @@ void FlameGraphGenerator::generateCombinedHtml(const std::vector < std::string >
     outputFile.close();
 }
 
-std::string FlameGraphGenerator::collapseStack() {
+std::string FlameGraphGenerator::collapseStack()
+{
     std::string collapseScriptPath;
 
-    switch (profType) {
+    switch (profType)
+    {
     case CLIParser::ProfilingType::OffCPU:
         collapseScriptPath = "../FlameGraph/stackcollapse-perf.pl";
         break;
@@ -130,7 +142,8 @@ std::string FlameGraphGenerator::collapseStack() {
     std::string tempPerfScript = "tempPerfScript.tmp";
 
     std::ofstream tempScriptFile(tempPerfScript);
-    if (!tempScriptFile.is_open()) {
+    if (!tempScriptFile.is_open())
+    {
         throw std::runtime_error("Failed to open temp file for perf data");
     }
 
@@ -141,22 +154,48 @@ std::string FlameGraphGenerator::collapseStack() {
 
     std::cout << cmd << std::endl;
 
-    std::array < char, 128 > buffer;
+    std::array<char, 128> buffer;
     std::string result;
-    std::shared_ptr < FILE > pipe(popen(cmd.c_str(), "r"), pclose);
-    if (!pipe) {
+    std::shared_ptr<FILE> pipe(popen(cmd.c_str(), "r"), pclose);
+    if (!pipe)
+    {
         throw std::runtime_error("popen() failed");
     }
 
-    while (!feof(pipe.get())) {
-        if (fgets(buffer.data(), 128, pipe.get()) != nullptr) {
+    while (!feof(pipe.get()))
+    {
+        if (fgets(buffer.data(), 128, pipe.get()) != nullptr)
+        {
             result += buffer.data();
         }
     }
 
-    if (remove(tempPerfScript.c_str()) != 0) {
+    if (remove(tempPerfScript.c_str()) != 0)
+    {
         std::cerr << "Warning: Failed to delete temp perf data file" << std::endl;
     }
 
     return result;
+}
+
+void FlameGraphGenerator::generateDiffFlameGraph(const std::string &file1, const std::string &file2, const std::string &outputPath)
+{
+    std::string foldCmd1 = "perl ../FlameGraph/stackcollapse-perf.pl " + file1 + " > out.folded1";
+    std::string foldCmd2 = "perl ../FlameGraph/stackcollapse-perf.pl " + file2 + " > out.folded2";
+    std::string diffCmd = "perl ../FlameGraph/difffolded.pl out.folded1 out.folded2 | ../FlameGraph/flamegraph.pl > " + outputPath + "_diff.svg";
+
+    system(foldCmd1.c_str());
+    system(foldCmd2.c_str());
+    int result = system(diffCmd.c_str());
+    if (result != 0)
+    {
+        throw std::runtime_error("Failed to generate differential Flamegraph");
+    }
+
+    if (remove("out.folded1") != 0) {
+        std::cerr << "Warning: Failed to delete folded data file 1" << std::endl;
+    }
+    if (remove("out.folded2") != 0) {
+        std::cerr << "Warning: Failed to delete folded data file 2" << std::endl;
+    }    
 }
