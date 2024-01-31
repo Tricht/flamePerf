@@ -63,6 +63,12 @@ public:
   // Get second diff file
   std::string getDiffFile2() const;
 
+  //
+  void setCustomFileName(const std::string name);
+
+  //
+  std::string getCustomFileName();
+
 private:
   int argc;
   char **argv;
@@ -75,6 +81,7 @@ private:
   std::set<ProfilingType> selectedProfilingTypes;
   bool diffFlag = false;
   std::string diffFile1, diffFile2;
+  std::string customFileName;
 };
 
 #endif

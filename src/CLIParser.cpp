@@ -88,6 +88,10 @@ void CLIParser::parseArgs()
                 }
             }
         }
+        else if (arg == "-f" || arg == "--filename")
+        {
+            setCustomFileName(argv[++i]);
+        }
         else // help message
         {
             std::cout << "Usage: " << std::endl;
@@ -148,4 +152,14 @@ std::string CLIParser::getDiffFile1() const
 std::string CLIParser::getDiffFile2() const
 {
     return diffFile2;
+}
+
+void CLIParser::setCustomFileName(const std::string name)
+{
+    customFileName = name;
+}
+
+std::string CLIParser::getCustomFileName()
+{
+    return customFileName;
 }

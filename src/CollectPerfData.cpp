@@ -16,7 +16,8 @@
 #include "FlameGraphGenerator.h"
 
 CollectPerfData::CollectPerfData(const std::string &options, int duration, CLIParser::ProfilingType profType,
-                                 const std::string &cmd, int pidToRecord) : options(options), duration(duration), profType(profType), cmdToExecute(cmd), pidToRecord(pidToRecord) {}
+                                 const std::string &cmd, int pidToRecord, const std::string &customFileName) : options(options), duration(duration), profType(profType), cmdToExecute(cmd),
+                                                                                                               pidToRecord(pidToRecord), customFileName(customFileName) {}
 
 void CollectPerfData::recordPerf()
 {
@@ -147,6 +148,10 @@ void CollectPerfData::setProfilingType(CLIParser::ProfilingType type)
 
 std::string CollectPerfData::genFileName()
 {
+    if (!customFileName.empty())
+    {
+        return "./results/" + customFileName;
+    }
     auto now = std::chrono::system_clock::now();
     auto now_c = std::chrono::system_clock::to_time_t(now);
     std::stringstream ss;
@@ -263,17 +268,20 @@ std::set<std::string> CollectPerfData::getAvailablePerfEvents()
 
                 // handle 'OR' in event names
                 auto orPos = event.find(" OR ");
-                if (orPos != std::string::npos) {
+                if (orPos != std::string::npos)
+                {
                     // split string into two events
                     std::string event1 = event.substr(0, orPos);
                     std::string event2 = event.substr(orPos + 4);
 
                     events.insert(event1);
                     events.insert(event2);
-                } else {
+                }
+                else
+                {
                     events.insert(event);
                 }
-            }            
+            }
         }
     }
 

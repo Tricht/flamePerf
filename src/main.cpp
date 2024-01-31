@@ -17,7 +17,7 @@ int main(int argc, char **argv)
         cliParser.parseArgs();
 
         // create perf data collector with arguments parsed from cli
-        CollectPerfData perfDataCollector(cliParser.getPerfOpts(), cliParser.getDuration(), cliParser.getProfType(), cliParser.getCmdToExecute(), cliParser.getPidToRecord());
+        CollectPerfData perfDataCollector(cliParser.getPerfOpts(), cliParser.getDuration(), cliParser.getProfType(), cliParser.getCmdToExecute(), cliParser.getPidToRecord(), cliParser.getCustomFileName());
         // create results directory
         perfDataCollector.initialize();
 

@@ -14,7 +14,7 @@ class CollectPerfData {
     public:
     // Constructor: initializes the collector
     CollectPerfData(const std::string & options, int duration, CLIParser::ProfilingType profType,
-    const std::string & cmd, int pidToRecord);
+    const std::string & cmd, int pidToRecord, const std::string & customFileName);
 
     // execute perf record with the options from the constructor
     void recordPerf();
@@ -42,6 +42,7 @@ class CollectPerfData {
     std::string cmdToExecute;
     int pidToRecord;
     std::map<CLIParser::ProfilingType, std::set<std::string>> optimalEventsForProfiles;
+    std::string customFileName;
 
     // executes a system command, should be used for perf cmds
     std::string execPerf(const std::string & command);
