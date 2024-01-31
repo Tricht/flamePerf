@@ -148,14 +148,12 @@ void CollectPerfData::setProfilingType(CLIParser::ProfilingType type)
 
 std::string CollectPerfData::genFileName()
 {
-    if (!customFileName.empty())
-    {
-        return "./results/" + customFileName;
-    }
+    std::string baseName = "./results/" + (!customFileName.empty() ? customFileName + "_" : "profile_");
+
     auto now = std::chrono::system_clock::now();
     auto now_c = std::chrono::system_clock::to_time_t(now);
     std::stringstream ss;
-    ss << "./results/profile_" << std::put_time(std::localtime(&now_c), "%d%m%Y_%H%M%S");
+    ss << baseName << std::put_time(std::localtime(&now_c), "%d%m%Y_%H%M%S");
 
     switch (profType)
     {
