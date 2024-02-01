@@ -38,7 +38,7 @@ void FlameGraphGenerator::generateFlameGraph(const std::string &outputPath)
     switch (profType)
     {
     case CLIParser::ProfilingType::CPU:
-        colorPalette = "--color=java";
+        colorPalette = "--color=js";
         break;
     case CLIParser::ProfilingType::OffCPU:
         colorPalette = "--color=io";

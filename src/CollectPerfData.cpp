@@ -13,6 +13,8 @@
 #include <sstream>
 #include <iomanip>
 #include <algorithm>
+#include <cstring>
+#include <iterator>
 #include "FlameGraphGenerator.h"
 
 CollectPerfData::CollectPerfData(const std::string &options, int duration, CLIParser::ProfilingType profType,
@@ -21,8 +23,59 @@ CollectPerfData::CollectPerfData(const std::string &options, int duration, CLIPa
 
 void CollectPerfData::recordPerf()
 {
+    std::vector<const char*> args;
+    args.push_back("perf");
+    args.push_back("record");
 
-    std::string perfCommand = "perf record ";
+    if (!options.empty()) {
+        // Split options string into individual arguments
+        std::istringstream iss(options);
+        std::vector<std::string> optionsVec(std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>());
+        for (const auto& opt : optionsVec) {
+            args.push_back(opt.c_str());
+        }
+    } else {
+        setProfilingType(profType);
+        // Split options string into individual arguments
+        std::istringstream iss(options);
+        std::vector<std::string> optionsVec(std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>());
+        for (const auto& opt : optionsVec) {
+            args.push_back(opt.c_str());
+        }        
+    }
+
+    std::cout << "Recorded perf events: " + options << std::endl;
+
+    pid_t pid = fork();
+
+    if (pid == -1) {
+        throw std::runtime_error("Fehler beim Erstellen eines neuen Prozesses");
+    } else if (pid == 0) {
+        if (!cmdToExecute.empty()) {
+            args.push_back("--");
+            args.push_back(cmdToExecute.c_str());
+        } else if (pidToRecord > -1) {
+            args.push_back("--pid");
+            args.push_back(std::to_string(pidToRecord).c_str());
+        }
+        args.push_back(NULL);
+
+        for (auto arg : args) {
+            std::cout << arg << std::endl;
+        }
+
+        execvp("perf", const_cast<char* const*>(args.data()));
+        exit(1);
+    } else {
+        // Elternprozess
+        if (duration > 0) {
+            std::this_thread::sleep_for(std::chrono::seconds(duration));
+            kill(pid, SIGINT);
+        }
+        int status;
+        waitpid(pid, &status, 0);
+    }    
+    /* std::string perfCommand = "perf record ";
 
     if (!options.empty())
     {
@@ -53,7 +106,7 @@ void CollectPerfData::recordPerf()
     if (status != 0)
     {
         throw std::runtime_error("Failed to execute perf record: " + status);
-    }
+    } */
 
     /*     std::future<void> collectFuture = std::async(std::launch::async, [this]() {
             pid_t pid = fork();
