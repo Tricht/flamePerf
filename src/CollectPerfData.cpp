@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <cstring>
 #include <iterator>
+#include <thread>
 #include "FlameGraphGenerator.h"
 
 CollectPerfData::CollectPerfData(const std::string &options, int duration, CLIParser::ProfilingType profType,
