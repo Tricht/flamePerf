@@ -7,8 +7,14 @@
 
 CLIParser::CLIParser(int argc, char **argv) : argc(argc), argv(argv) {}
 
-void CLIParser::parseArgs()
+bool CLIParser::parseArgs()
 {
+    if (argc == 1)
+    {
+        showHelp();
+        return false;
+    }
+
     for (int i = 1; i < argc; ++i)
     {
         std::string arg = argv[i];
@@ -92,11 +98,19 @@ void CLIParser::parseArgs()
         {
             setCustomFileName(argv[++i]);
         }
+        else if (arg == "-h" || "--help")
+        {
+            showHelp();
+            return false;
+        }
         else // help message
         {
-            std::cout << "Usage: " << std::endl;
+            showHelp();
+            return false;
         }
     }
+
+    return true;
 }
 
 std::string CLIParser::getPerfOpts()
@@ -162,4 +176,17 @@ void CLIParser::setCustomFileName(const std::string name)
 std::string CLIParser::getCustomFileName()
 {
     return customFileName;
+}
+
+void CLIParser::showHelp()
+{
+    std::cout << "Usage: flamePerf [OPTIONS]" << std::endl;
+    std::cout << "Options:" << std::endl;
+    std::cout << "  -o, --perf-options\tSet options for the perf command" << std::endl;
+    std::cout << "  -d, --duration\t\tSpecify the duration for the perf recording" << std::endl;
+    std::cout << "  -c, --cmd\t\tExecute a specific command" << std::endl;
+    std::cout << "  --pid\t\t\tRecord a specific process by PID" << std::endl;
+    std::cout << "  --all-profiles\t\tRecord all available profiles" << std::endl;
+    std::cout << "  -p, --profile-types\tSpecify types of profiles to record" << std::endl;
+    std::cout << "Example: flamePerf -d 5 --all-profiles" << std::endl;
 }

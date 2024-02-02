@@ -28,7 +28,7 @@ public:
   };
 
   // Parses the cli arguments and sets flags/values.
-  void parseArgs();
+  bool parseArgs();
 
   // Returns the options for perf record
   std::string getPerfOpts();
@@ -82,6 +82,8 @@ private:
   bool diffFlag = false;
   std::string diffFile1, diffFile2;
   std::string customFileName;
+
+  void showHelp();
 };
 
 #endif
