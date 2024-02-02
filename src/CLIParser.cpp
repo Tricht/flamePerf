@@ -188,5 +188,6 @@ void CLIParser::showHelp()
     std::cout << "  --pid\t\t\tRecord a specific process by PID" << std::endl;
     std::cout << "  --all-profiles\t\tRecord all available profiles" << std::endl;
     std::cout << "  -p, --profile-types\tSpecify types of profiles to record" << std::endl;
+    std::cout << "  -f, --filename\tSet name for sstack profiles and flamegraphs" << std::endl;
     std::cout << "Example: flamePerf -d 5 --all-profiles" << std::endl;
 }
