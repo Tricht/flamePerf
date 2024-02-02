@@ -94,7 +94,15 @@ void CLIParser::parseArgs()
         }
         else // help message
         {
-            std::cout << "Usage: " << std::endl;
+            std::cout << "Usage: flamePerf [OPTIONS]" << std::endl;
+            std::cout << "Options:" << std::endl;
+            std::cout << "  -o, --perf-options\tSet options for the perf command" << std::endl;
+            std::cout << "  -d, --duration\t\tSpecify the duration for the perf recording" << std::endl;
+            std::cout << "  -c, --cmd\t\tExecute a specific command" << std::endl;
+            std::cout << "  --pid\t\t\tRecord a specific process by PID" << std::endl;
+            std::cout << "  --all-profiles\t\tRecord all available profiles" << std::endl;
+            std::cout << "  -p, --profile-types\tSpecify types of profiles to record" << std::endl;
+            std::cout << "Example: flamePerf -d 5 --all-profiles" << std::endl;
         }
     }
 }
