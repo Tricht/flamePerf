@@ -69,7 +69,7 @@ void FlameGraphGenerator::generateFlameGraph(const std::string &outputPath)
     }
 }
 
-void FlameGraphGenerator::generateCombinedHtml(const std::vector<std::string> &fileNames)
+void FlameGraphGenerator::generateCombinedHtml(const std::vector<std::string> &fileNames, const std::string &diffFileName = "")
 {
     auto now = std::chrono::system_clock::now();
     auto now_c = std::chrono::system_clock::to_time_t(now);
@@ -85,8 +85,15 @@ void FlameGraphGenerator::generateCombinedHtml(const std::vector<std::string> &f
 
     std::string tabs, content;
 
-    for (size_t i = 0; i < fileNames.size(); ++i)
-    {
+    if (!diffFileName.empty()) {
+        tabs += "<div class='tab active' onclick='openTab(event, \"tabDiff\")'>Differential</div>";
+        content += "<div id='tabDiff' class='content flamegraph active'>";
+        content += "<object data='" + diffFileName + "' type='image/svg+xml' id='flamegraphDiff' width='100%' height='100%'></object>";
+        content += "</div>";
+    }
+
+    // Tabs for the original FlameGraphs
+    for (size_t i = 0; i < fileNames.size(); ++i) {
         // naming for tabs
         size_t lastSlash = fileNames[i].find_last_of("/\\");
         std::string fileName = (lastSlash != std::string::npos) ? fileNames[i].substr(lastSlash + 1) : fileNames[i];
@@ -105,23 +112,21 @@ void FlameGraphGenerator::generateCombinedHtml(const std::vector<std::string> &f
         content += "<div id='tab" + std::to_string(i + 1) + "' class='content flamegraph" + std::string(i == 0 ? " active" : "") + "'>";
         content += "<object data='" + svgFilePath + "' type='image/svg+xml' id='flamegraph" + std::to_string(i + 1) + "' width='100%' height='100%'></object>";
         content += "</div>";
+
     }
 
     size_t tabsPos = htmlContent.find("{{tabs}}");
-    if (tabsPos != std::string::npos)
-    {
+    if (tabsPos != std::string::npos) {
         htmlContent.replace(tabsPos, 8, tabs);
     }
 
     size_t contentPos = htmlContent.find("{{content}}");
-    if (contentPos != std::string::npos)
-    {
+    if (contentPos != std::string::npos) {
         htmlContent.replace(contentPos, 11, content);
     }
 
     std::ofstream outputFile(htmlFileName);
     outputFile << htmlContent;
-
     outputFile.close();
 }
 
@@ -182,7 +187,8 @@ void FlameGraphGenerator::generateDiffFlameGraph(const std::string &file1, const
 {
     std::string foldCmd1 = "perl ../FlameGraph/stackcollapse-perf.pl " + file1 + " > out.folded1";
     std::string foldCmd2 = "perl ../FlameGraph/stackcollapse-perf.pl " + file2 + " > out.folded2";
-    std::string diffCmd = "perl ../FlameGraph/difffolded.pl out.folded1 out.folded2 | ../FlameGraph/flamegraph.pl > " + outputPath + "_diff.svg";
+    std::string diffFileName = outputPath + "_diff.svg";
+    std::string diffCmd = "perl ../FlameGraph/difffolded.pl out.folded1 out.folded2 | ../FlameGraph/flamegraph.pl > " + diffFileName;
 
     system(foldCmd1.c_str());
     system(foldCmd2.c_str());
@@ -197,5 +203,11 @@ void FlameGraphGenerator::generateDiffFlameGraph(const std::string &file1, const
     }
     if (remove("out.folded2") != 0) {
         std::cerr << "Warning: Failed to delete folded data file 2" << std::endl;
-    }    
+    }
+
+    size_t lastSlashIndex = diffFileName.find_last_of("/\\");
+    std::string diffFileOnly = (lastSlashIndex != std::string::npos) ? diffFileName.substr(lastSlashIndex + 1) : diffFileName;
+
+    std::vector<std::string> originalFileNames = {file1 + ".svg", file2 + ".svg"};
+    generateCombinedHtml(originalFileNames, diffFileOnly);
 }

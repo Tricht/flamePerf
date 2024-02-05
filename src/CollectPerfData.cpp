@@ -229,7 +229,7 @@ void CollectPerfData::recordProfiles(const std::set<CLIParser::ProfilingType> &t
     }
 
     FlameGraphGenerator fgGenerator;
-    fgGenerator.generateCombinedHtml(fgFileNames);
+    fgGenerator.generateCombinedHtml(fgFileNames, "");
 }
 
 void CollectPerfData::recordAllProfiles()

@@ -14,7 +14,7 @@ public:
 
     void generateFlameGraph(const std::string &outputPath);
 
-    void generateCombinedHtml(const std::vector<std::string> &fileNames);
+    void generateCombinedHtml(const std::vector<std::string> &fileNames, const std::string &diffFileName);
 
     void generateDiffFlameGraph(const std::string &file1, const std::string &file2, const std::string &outputPath);
 
