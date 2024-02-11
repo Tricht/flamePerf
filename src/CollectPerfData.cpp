@@ -30,7 +30,7 @@ void CollectPerfData::handleSignal(int signum)
         kill(perfPID, SIGINT);
         waitpid(perfPID, NULL, 0);
     }
-    exit(signum);
+    // exit(signum);
 }
 
 pid_t CollectPerfData::perfPID = 0;
