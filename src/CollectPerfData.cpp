@@ -71,6 +71,10 @@ void CollectPerfData::recordPerf()
         args.push_back("--pid");
         args.push_back(std::to_string(pidToRecord));
     }
+    else
+    {
+        args.insert(args.begin() + 2, "-a");
+    }
 
     std::vector<const char *> c_args;
     for (const auto &arg : args)
@@ -165,7 +169,7 @@ void CollectPerfData::setProfilingType(CLIParser::ProfilingType type)
     auto filteredEvents = getFilteredEventsForType(type);
     options.clear();
 
-    options += "-F 99 -ag ";
+    options += "-F 99 -g ";
     for (const auto &event : filteredEvents)
     {
         options += "-e " + event + " ";
