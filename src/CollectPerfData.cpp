@@ -63,8 +63,10 @@ void CollectPerfData::recordPerf()
 
     if (!cmdToExecute.empty())
     {
+        std::istringstream iss(cmdToExecute);
+        std::vector<std::string> cmdArgs(std::istream_iterator<std::string>{iss}, {});
         args.push_back("--");
-        args.push_back(cmdToExecute);
+        args.insert(args.end(), cmdArgs.begin(), cmdArgs.end());
     }
     else if (pidToRecord > -1)
     {
