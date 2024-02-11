@@ -10,11 +10,12 @@
 #include <map>
 
 // CollectPerfData class provides functions to record, convert and store perf data
-class CollectPerfData {
-    public:
+class CollectPerfData
+{
+public:
     // Constructor: initializes the collector
-    CollectPerfData(const std::string & options, int duration, CLIParser::ProfilingType profType,
-    const std::string & cmd, int pidToRecord, const std::string & customFileName);
+    CollectPerfData(const std::string &options, int duration, CLIParser::ProfilingType profType,
+                    const std::string &cmd, int pidToRecord, const std::string &customFileName);
 
     // execute perf record with the options from the constructor
     void recordPerf();
@@ -32,11 +33,14 @@ class CollectPerfData {
     void recordAllProfiles();
 
     // record selected Profiling Types
-    void recordSelectedProfiles(const std::set <CLIParser::ProfilingType> & selectedTypes);
+    void recordSelectedProfiles(const std::set<CLIParser::ProfilingType> &selectedTypes);
 
-    private:
+    // signal handler
+    static void handleSignal(int signum);
+
+private:
     std::string options;
-    pid_t perfPID;
+    static pid_t perfPID;
     int duration;
     CLIParser::ProfilingType profType;
     std::string cmdToExecute;
@@ -45,17 +49,17 @@ class CollectPerfData {
     std::string customFileName;
 
     // executes a system command, should be used for perf cmds
-    std::string execPerf(const std::string & command);
+    std::string execPerf(const std::string &command);
 
     // sets the perf events to record for different Profiling Types
     void setProfilingType(CLIParser::ProfilingType type);
 
     // records and retrieves perf data for the set of selected Profiling Types
-    void recordProfiles(const std::set < CLIParser::ProfilingType > & types);
+    void recordProfiles(const std::set<CLIParser::ProfilingType> &types);
 
     // collect available perf events on system
     static std::set<std::string> getAvailablePerfEvents();
-    
+
     // create lists with optimal events for every profiling type
     void initializeOptimalEvents();
 

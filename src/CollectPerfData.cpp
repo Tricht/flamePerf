@@ -22,8 +22,21 @@ CollectPerfData::CollectPerfData(const std::string &options, int duration, CLIPa
                                  const std::string &cmd, int pidToRecord, const std::string &customFileName) : options(options), duration(duration), profType(profType), cmdToExecute(cmd),
                                                                                                                pidToRecord(pidToRecord), customFileName(customFileName) {}
 
+void CollectPerfData::handleSignal(int signum)
+{
+    std::cout << "Got SIGINT, stop perf record" << std::endl;
+    if (perfPID > 0)
+    {
+        kill(perfPID, SIGINT);
+        waitpid(perfPID, NULL, 0);
+    }
+    exit(signum);
+}
+
 void CollectPerfData::recordPerf()
 {
+    signal(SIGINT, CollectPerfData::handleSignal);
+
     std::vector<std::string> args;
     args.push_back("perf");
     args.push_back("record");
