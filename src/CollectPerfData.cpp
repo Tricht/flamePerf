@@ -33,6 +33,8 @@ void CollectPerfData::handleSignal(int signum)
     exit(signum);
 }
 
+pid_t CollectPerfData::perfPID = 0;
+
 void CollectPerfData::recordPerf()
 {
     signal(SIGINT, CollectPerfData::handleSignal);
