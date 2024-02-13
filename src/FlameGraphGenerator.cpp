@@ -1,17 +1,10 @@
 #include "FlameGraphGenerator.h"
-
 #include <fstream>
-
 #include <array>
-
 #include <memory>
-
 #include <iostream>
-
 #include <sstream>
-
 #include <chrono>
-
 #include <iomanip>
 
 FlameGraphGenerator::FlameGraphGenerator() {}
@@ -85,7 +78,8 @@ void FlameGraphGenerator::generateCombinedHtml(const std::vector<std::string> &f
 
     std::string tabs, content;
 
-    if (!diffFileName.empty()) {
+    if (!diffFileName.empty())
+    {
         tabs += "<div class='tab active' onclick='openTab(event, \"tabDiff\")'>Differential</div>";
         content += "<div id='tabDiff' class='content flamegraph active'>";
         content += "<object data='" + diffFileName + "' type='image/svg+xml' id='flamegraphDiff' width='100%' height='100%'></object>";
@@ -93,7 +87,8 @@ void FlameGraphGenerator::generateCombinedHtml(const std::vector<std::string> &f
     }
 
     // Tabs for the original FlameGraphs
-    for (size_t i = 0; i < fileNames.size(); ++i) {
+    for (size_t i = 0; i < fileNames.size(); ++i)
+    {
         // naming for tabs
         size_t lastSlash = fileNames[i].find_last_of("/\\");
         std::string fileName = (lastSlash != std::string::npos) ? fileNames[i].substr(lastSlash + 1) : fileNames[i];
@@ -112,16 +107,17 @@ void FlameGraphGenerator::generateCombinedHtml(const std::vector<std::string> &f
         content += "<div id='tab" + std::to_string(i + 1) + "' class='content flamegraph" + std::string(i == 0 ? " active" : "") + "'>";
         content += "<object data='" + svgFilePath + "' type='image/svg+xml' id='flamegraph" + std::to_string(i + 1) + "' width='100%' height='100%'></object>";
         content += "</div>";
-
     }
 
     size_t tabsPos = htmlContent.find("{{tabs}}");
-    if (tabsPos != std::string::npos) {
+    if (tabsPos != std::string::npos)
+    {
         htmlContent.replace(tabsPos, 8, tabs);
     }
 
     size_t contentPos = htmlContent.find("{{content}}");
-    if (contentPos != std::string::npos) {
+    if (contentPos != std::string::npos)
+    {
         htmlContent.replace(contentPos, 11, content);
     }
 
@@ -198,10 +194,12 @@ void FlameGraphGenerator::generateDiffFlameGraph(const std::string &file1, const
         throw std::runtime_error("Failed to generate differential Flamegraph");
     }
 
-    if (remove("out.folded1") != 0) {
+    if (remove("out.folded1") != 0)
+    {
         std::cerr << "Warning: Failed to delete folded data file 1" << std::endl;
     }
-    if (remove("out.folded2") != 0) {
+    if (remove("out.folded2") != 0)
+    {
         std::cerr << "Warning: Failed to delete folded data file 2" << std::endl;
     }
 

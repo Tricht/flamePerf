@@ -63,10 +63,10 @@ public:
   // Get second diff file
   std::string getDiffFile2() const;
 
-  //
+  // set custom file name from user input
   void setCustomFileName(const std::string name);
 
-  //
+  // get custom file name
   std::string getCustomFileName();
 
 private:
@@ -83,6 +83,7 @@ private:
   std::string diffFile1, diffFile2;
   std::string customFileName;
 
+  // show help/usagem message
   void showHelp();
 };
 

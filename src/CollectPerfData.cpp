@@ -18,10 +18,9 @@
 #include <thread>
 #include "FlameGraphGenerator.h"
 
-CollectPerfData::CollectPerfData(const std::string &options, int duration, CLIParser::ProfilingType profType,
-                                 const std::string &cmd, int pidToRecord, const std::string &customFileName) : options(options), duration(duration), profType(profType), cmdToExecute(cmd),
-                                                                                                               pidToRecord(pidToRecord), customFileName(customFileName) {}
+CollectPerfData::CollectPerfData(const std::string &options, int duration, CLIParser::ProfilingType profType, const std::string &cmd, int pidToRecord, const std::string &customFileName) : options(options), duration(duration), profType(profType), cmdToExecute(cmd), pidToRecord(pidToRecord), customFileName(customFileName) {}
 
+// handle SIGINT to stop perf record, but not the whole process
 void CollectPerfData::handleSignal(int signum)
 {
     std::cout << "Got SIGINT, stop perf record" << std::endl;
@@ -30,19 +29,24 @@ void CollectPerfData::handleSignal(int signum)
         kill(perfPID, SIGINT);
         waitpid(perfPID, NULL, 0);
     }
+    // do not exit
     // exit(signum);
 }
 
+// initialize static pid for perf
 pid_t CollectPerfData::perfPID = 0;
 
 void CollectPerfData::recordPerf()
 {
+    // handle SIGINT
     signal(SIGINT, CollectPerfData::handleSignal);
 
+    // create arguments vector and add perf and record as first two args
     std::vector<std::string> args;
     args.push_back("perf");
     args.push_back("record");
 
+    // insert perf options chosen by user
     if (!options.empty())
     {
         std::istringstream iss(options);
@@ -50,6 +54,7 @@ void CollectPerfData::recordPerf()
                   std::istream_iterator<std::string>(),
                   std::back_inserter(args));
     }
+    // when no user input for options, insert profiling type
     else
     {
         setProfilingType(profType);
@@ -61,6 +66,7 @@ void CollectPerfData::recordPerf()
 
     std::cout << "Recorded perf events: " + options << std::endl;
 
+    // add command to analyze
     if (!cmdToExecute.empty())
     {
         std::istringstream iss(cmdToExecute);
@@ -68,16 +74,19 @@ void CollectPerfData::recordPerf()
         args.push_back("--");
         args.insert(args.end(), cmdArgs.begin(), cmdArgs.end());
     }
+    // or add pid to analyze
     else if (pidToRecord > -1)
     {
         args.push_back("--pid");
         args.push_back(std::to_string(pidToRecord));
     }
+    // when no cmd or pid was selected, analyze all cpus and processes. Add -a flag after perf record
     else
     {
         args.insert(args.begin() + 2, "-a");
     }
 
+    // convert args to c_string
     std::vector<const char *> c_args;
     for (const auto &arg : args)
     {
@@ -85,19 +94,23 @@ void CollectPerfData::recordPerf()
     }
     c_args.push_back(nullptr);
 
+    // create new process
     pid_t pid = fork();
 
     if (pid == -1)
     {
         throw std::runtime_error("Error creating new process");
     }
+    // execute perf record with arguments
     else if (pid == 0)
     {
         execvp("perf", const_cast<char *const *>(c_args.data()));
+        std::cerr << "Error during execvp: " << strerror(errno) << std::endl;
         exit(1);
     }
     else
     {
+        // kill process when duration is reached
         if (duration > 0)
         {
             std::this_thread::sleep_for(std::chrono::seconds(duration));
@@ -105,17 +118,22 @@ void CollectPerfData::recordPerf()
         }
         int status;
         waitpid(pid, &status, 0);
+        if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
+        {
+            throw std::runtime_error("Child process ended with error");
+        }
     }
 }
 
 std::string CollectPerfData::retriveData()
 {
+    // execute perf script
     std::string perfData = execPerf("perf script");
     if (perfData.empty())
     {
         throw std::runtime_error("No output from perf script");
     }
-
+    // give unique name to scripted data and save it
     std::string fileName = genFileName();
     std::ofstream outFile(fileName);
     if (!outFile.is_open())
@@ -131,6 +149,7 @@ std::string CollectPerfData::retriveData()
 
 void CollectPerfData::initialize()
 {
+    // create results directory
     const char *dirName = "./results";
     if (mkdir(dirName, 0777) == -1)
     {
@@ -139,12 +158,13 @@ void CollectPerfData::initialize()
             throw std::runtime_error("Failed to create directory");
         }
     }
-
+    // look for available perf events for each profiling type
     initializeOptimalEvents();
 }
 
 std::string CollectPerfData::execPerf(const std::string &command)
 {
+    // execute system command
     std::array<char, 1024> buffer;
     std::string result;
     std::shared_ptr<FILE> pipe(popen(command.c_str(), "r"), pclose);
@@ -161,32 +181,38 @@ std::string CollectPerfData::execPerf(const std::string &command)
             result += buffer.data();
         }
     }
-
+    // return data created by cmd
     return result;
 }
 
 void CollectPerfData::setProfilingType(CLIParser::ProfilingType type)
 {
+    // get available perf events for profiling type
     profType = type;
     auto filteredEvents = getFilteredEventsForType(type);
     options.clear();
 
+    // options 'base' will operate by a frequency of 99Hz and creates call-graphs
     options += "-F 99 -g ";
     for (const auto &event : filteredEvents)
     {
+        // add event to call
         options += "-e " + event + " ";
     }
 }
 
 std::string CollectPerfData::genFileName()
 {
+    // file name starts with result dir and 'profile_'
     std::string baseName = "./results/" + (!customFileName.empty() ? customFileName + "_" : "profile_");
 
     auto now = std::chrono::system_clock::now();
     auto now_c = std::chrono::system_clock::to_time_t(now);
     std::stringstream ss;
+    // add date and time to filename
     ss << baseName << std::put_time(std::localtime(&now_c), "%d%m%Y_%H%M%S");
 
+    // add profiling type to filename
     switch (profType)
     {
     case CLIParser::ProfilingType::CPU:
@@ -210,6 +236,7 @@ std::string CollectPerfData::genFileName()
         break;
     }
 
+    // remove special chars and whitespace from command to analyze; add it to filename
     if (!cmdToExecute.empty())
     {
         std::string safeCmd = cmdToExecute;
@@ -230,12 +257,17 @@ void CollectPerfData::recordProfiles(const std::set<CLIParser::ProfilingType> &t
 
     for (auto type : types)
     {
+        // set profiling type
         setProfilingType(type);
+        // execute perf record
         recordPerf();
 
+        // perf script data
         std::string perfData = retriveData();
+        // generate filename
         std::string profFileName = genFileName();
 
+        // save scripted perf data to a file
         std::ofstream outFile(profFileName);
         if (!outFile.is_open())
         {
@@ -244,17 +276,20 @@ void CollectPerfData::recordProfiles(const std::set<CLIParser::ProfilingType> &t
         outFile << perfData;
         outFile.close();
 
+        // generate Flame Graph for perf data
         FlameGraphGenerator flameGraphGenerator(perfData, type);
         flameGraphGenerator.generateFlameGraph(profFileName);
+        // push back Flame Graph filenames
         fgFileNames.push_back(profFileName + ".svg");
     }
-
+    // generate the combined Flame Graph html file with created Flame Graphs from before
     FlameGraphGenerator fgGenerator;
     fgGenerator.generateCombinedHtml(fgFileNames, "");
 }
 
 void CollectPerfData::recordAllProfiles()
 {
+    // define what are 'all' profiles
     std::set<CLIParser::ProfilingType> allTypes = {
         CLIParser::ProfilingType::CPU,
         CLIParser::ProfilingType::OffCPU,
@@ -262,11 +297,13 @@ void CollectPerfData::recordAllProfiles()
         CLIParser::ProfilingType::IO,
         CLIParser::ProfilingType::Network};
 
+    // record them
     recordProfiles(allTypes);
 }
 
 void CollectPerfData::recordSelectedProfiles(const std::set<CLIParser::ProfilingType> &selectedTypes)
 {
+    // record selected profiles
     recordProfiles(selectedTypes);
 }
 
@@ -275,6 +312,7 @@ std::set<std::string> CollectPerfData::getAvailablePerfEvents()
     std::set<std::string> events;
     std::array<char, 1024> buffer;
     std::string command = "perf list";
+    // execute perf list to get all available events
     std::shared_ptr<FILE> pipe(popen(command.c_str(), "r"), pclose);
 
     if (!pipe)
@@ -287,6 +325,7 @@ std::set<std::string> CollectPerfData::getAvailablePerfEvents()
         if (fgets(buffer.data(), 128, pipe.get()) != nullptr)
         {
             std::string line = buffer.data();
+            // search for end of event line
             auto pos = line.find('[');
             if (pos != std::string::npos)
             {
