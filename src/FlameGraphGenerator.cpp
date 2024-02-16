@@ -14,7 +14,7 @@ FlameGraphGenerator::FlameGraphGenerator(const std::string &perfData, CLIParser:
 void FlameGraphGenerator::generateFlameGraph(const std::string &outputPath)
 {
     std::string collapsedData = collapseStack();
-    std::cout << "Collapsed Data Length: " << collapsedData.length() << std::endl;
+    std::cout << "Collapsed Data Length: " << collapsedData.length() << std::endl; // DEBUG
 
     std::string tempCollOut = "tempCollOut.tmp";
 
@@ -128,7 +128,7 @@ void FlameGraphGenerator::generateCombinedHtml(const std::vector<std::string> &f
 
 std::string FlameGraphGenerator::collapseStack()
 {
-    std::string collapseScriptPath;
+    /* std::string collapseScriptPath;
 
     switch (profType)
     {
@@ -138,7 +138,8 @@ std::string FlameGraphGenerator::collapseStack()
     default:
         collapseScriptPath = "../FlameGraph/stackcollapse-perf.pl";
         break;
-    }
+    } */
+    std::string collapseScriptPath = "../FlameGraph/stackcollapse-perf.pl";
 
     std::string tempPerfScript = "tempPerfScript.tmp";
 
@@ -151,9 +152,9 @@ std::string FlameGraphGenerator::collapseStack()
     tempScriptFile << perfData;
     tempScriptFile.close();
 
-    std::string cmd = "perl " + collapseScriptPath + " --all " + tempPerfScript;
+    std::string cmd = "perl " + collapseScriptPath + " " + tempPerfScript;
 
-    std::cout << cmd << std::endl;
+    std::cout << cmd << std::endl; // DEBUG
 
     std::array<char, 128> buffer;
     std::string result;

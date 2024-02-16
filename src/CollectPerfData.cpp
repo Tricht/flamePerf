@@ -158,7 +158,7 @@ void CollectPerfData::initialize()
             throw std::runtime_error("Failed to create directory");
         }
     }
-    // look for available perf events for each profiling type
+    // set optimal events for each profiling type
     initializeOptimalEvents();
 }
 
@@ -192,7 +192,7 @@ void CollectPerfData::setProfilingType(CLIParser::ProfilingType type)
     auto filteredEvents = getFilteredEventsForType(type);
     options.clear();
 
-    // options 'base' will operate by a frequency of 99Hz and creates call-graphs
+    // options 'base' will operate by a frequency of 99Hz and creates stacktraces
     options += "-F 99 -g ";
     for (const auto &event : filteredEvents)
     {

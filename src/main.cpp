@@ -1,11 +1,7 @@
 #include "CLIParser.h"
-
 #include "CollectPerfData.h"
-
 #include "FlameGraphGenerator.h"
-
 #include <iostream>
-
 #include <stdexcept>
 
 int main(int argc, char **argv)
@@ -49,7 +45,7 @@ int main(int argc, char **argv)
                 perfDataCollector.recordPerf();
                 std::string perfData = perfDataCollector.retriveData();
                 std::string fgName = perfDataCollector.genFileName();
-                FlameGraphGenerator flameGraphGenerator(perfData, cliParser.getProfType());
+                FlameGraphGenerator flameGraphGenerator(perfData, CLIParser::ProfilingType::Default);
                 flameGraphGenerator.generateFlameGraph(fgName);
             }
         }
