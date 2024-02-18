@@ -18,7 +18,7 @@ public:
   CLIParser(int argc, char **argv);
 
   // enum to represent the different Profiling Types
-  enum ProfilingType
+  enum class ProfilingType
   {
     CPU,
     OffCPU,
@@ -70,12 +70,6 @@ public:
   // get custom file name
   std::string getCustomFileName();
 
-  //
-  void addCustomProfilingType(const std::string &name, const std::string &options);
-
-  //
-  const std::map<std::string, std::string> &getCustomProfilingTypes() const;
-
 private:
   int argc;
   char **argv;
@@ -89,7 +83,6 @@ private:
   bool diffFlag = false;
   std::string diffFile1, diffFile2;
   std::string customFileName;
-  std::map<std::string, std::string> customProfilingTypes;
 
   // show help/usagem message
   void showHelp();

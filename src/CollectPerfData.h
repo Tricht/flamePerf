@@ -52,7 +52,7 @@ private:
     std::string execPerf(const std::string &command);
 
     // sets the perf events to record for different Profiling Types
-    void setProfilingType(CLIParser::ProfilingType type, const std::string &customEvents);
+    void setProfilingType(CLIParser::ProfilingType type);
 
     // records and retrieves perf data for the set of selected Profiling Types
     void recordProfiles(const std::set<CLIParser::ProfilingType> &types);

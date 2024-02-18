@@ -2,6 +2,7 @@
 // Implements the CLIParser class methods defined in CLIParser.h.
 
 #include "CLIParser.h"
+#include "ProfilingManager.h"
 #include <iostream>
 #include <sstream>
 
@@ -100,13 +101,15 @@ bool CLIParser::parseArgs()
         }
         else if (arg == "--custom-profile")
         {
+            ProfilingManager profilingManager("../profiles.txt");
             std::string profile = argv[++i];
             auto deliPos = profile.find("=");
             if (deliPos != std::string::npos)
             {
                 std::string profName = profile.substr(0, deliPos);
                 std::string profEvents = profile.substr(deliPos + 1);
-                addCustomProfilingType(profName, profEvents);
+                profilingManager.saveProfile(profName, profEvents);
+                return false;
             }
         }
         else if (arg == "-h" || "--help")
@@ -187,16 +190,6 @@ void CLIParser::setCustomFileName(const std::string name)
 std::string CLIParser::getCustomFileName()
 {
     return customFileName;
-}
-
-void CLIParser::addCustomProfilingType(const std::string &name, const std::string &options)
-{
-    customProfilingTypes[name] = options;
-}
-
-const std::map<std::string, std::string> &CLIParser::getCustomProfilingTypes() const
-{
-    return customProfilingTypes;
 }
 
 void CLIParser::showHelp()
