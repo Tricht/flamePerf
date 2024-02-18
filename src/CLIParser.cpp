@@ -16,6 +16,9 @@ bool CLIParser::parseArgs()
         return false;
     }
 
+    ProfilingManager profilingManager("../profiles.txt");
+    auto customProfiles = profilingManager.loadProfiles();
+
     for (int i = 1; i < argc; ++i)
     {
         std::string arg = argv[i];
@@ -65,21 +68,22 @@ bool CLIParser::parseArgs()
         else if (arg == "-p" || arg == "--profile-types") // record chosen profiles
         {
             std::string types = argv[++i];
+            std::istringstream typesStream(types);
+            std::string type;
 
-            ProfilingManager profilingManager("../profiles.txt");
-            auto profiles = profilingManager.loadProfiles();
-
-            if (profiles.find(types) != profiles.end())
+            while (std::getline(typesStream, type, ','))
             {
-                std::string profEvents = profiles[types];
-                perfOpts = profEvents;
-                profType = CLIParser::ProfilingType::Custom;
-            }
-            else
-            {
-                std::istringstream typesStream(types);
-                std::string type;
-                while (std::getline(typesStream, type, ','))
+                if (customProfiles.find(type) != customProfiles.end())
+                {
+                    std::string events = customProfiles[type];
+                    std::istringstream eventsStream(events);
+                    std::string event;
+                    while (std::getline(eventsStream, event, ','))
+                    {
+                        perfOpts += "-e " + event + " ";
+                    }
+                }
+                else
                 {
                     if (type == "cpu")
                     {
@@ -114,7 +118,6 @@ bool CLIParser::parseArgs()
         }
         else if (arg == "--custom-profile")
         {
-            ProfilingManager profilingManager("../profiles.txt");
             std::string profile = argv[++i];
             auto deliPos = profile.find("=");
             if (deliPos != std::string::npos)
