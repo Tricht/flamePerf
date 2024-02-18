@@ -187,19 +187,23 @@ std::string CollectPerfData::execPerf(const std::string &command)
 
 void CollectPerfData::setProfilingType(CLIParser::ProfilingType type, const std::string &customEvents)
 {
+    options.clear();
+
+    // options 'base' will operate by a frequency of 99Hz and creates stacktraces
+    options += "-F 99 -g ";
+
     if (!customEvents.empty())
     {
-        options += "-e " + std::replace(customEvents.begin(), customEvents.end(), ',', ' ') + " ";
+        std::string events = customEvents;
+        std::replace(events.begin(), events.end(), ',', ' ');
+        options += "-e " + events + " ";
     }
     else
     {
         // get available perf events for profiling type
         profType = type;
         auto filteredEvents = getFilteredEventsForType(type);
-        options.clear();
 
-        // options 'base' will operate by a frequency of 99Hz and creates stacktraces
-        options += "-F 99 -g ";
         for (const auto &event : filteredEvents)
         {
             // add event to call
