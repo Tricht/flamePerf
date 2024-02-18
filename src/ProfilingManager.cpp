@@ -1,4 +1,5 @@
 #include "ProfilingManager.h"
+#include <iostream>
 
 ProfilingManager::ProfilingManager(const std::string &filePath) : filePath(filePath) {}
 
@@ -9,6 +10,8 @@ void ProfilingManager::saveProfile(const std::string &name, const std::string &e
     {
         file << name << "=" << events << std::endl;
     }
+
+    std::cout << "Saved profile: " + name << std::endl;
 }
 
 std::map<std::string, std::string> ProfilingManager::loadProfiles()

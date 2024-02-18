@@ -65,33 +65,46 @@ bool CLIParser::parseArgs()
         else if (arg == "-p" || arg == "--profile-types") // record chosen profiles
         {
             std::string types = argv[++i];
-            std::istringstream typesStream(types);
-            std::string type;
-            while (std::getline(typesStream, type, ','))
+
+            ProfilingManager profilingManager("../profiles.txt");
+            auto profiles = profilingManager.loadProfiles();
+
+            if (profiles.find(types) != profiles.end())
             {
-                if (type == "cpu")
+                std::string profEvents = profiles[types];
+                perfOpts = profEvents;
+                profType = CLIParser::ProfilingType::Custom;
+            }
+            else
+            {
+                std::istringstream typesStream(types);
+                std::string type;
+                while (std::getline(typesStream, type, ','))
                 {
-                    addProfilingType(ProfilingType::CPU);
-                }
-                else if (type == "offcpu")
-                {
-                    addProfilingType(ProfilingType::OffCPU);
-                }
-                else if (type == "mem")
-                {
-                    addProfilingType(ProfilingType::Memory);
-                }
-                else if (type == "io")
-                {
-                    addProfilingType(ProfilingType::IO);
-                }
-                else if (type == "net")
-                {
-                    addProfilingType(ProfilingType::Network);
-                }
-                else
-                {
-                    std::cerr << "Invalid profiling type: " << type << std::endl;
+                    if (type == "cpu")
+                    {
+                        addProfilingType(ProfilingType::CPU);
+                    }
+                    else if (type == "offcpu")
+                    {
+                        addProfilingType(ProfilingType::OffCPU);
+                    }
+                    else if (type == "mem")
+                    {
+                        addProfilingType(ProfilingType::Memory);
+                    }
+                    else if (type == "io")
+                    {
+                        addProfilingType(ProfilingType::IO);
+                    }
+                    else if (type == "net")
+                    {
+                        addProfilingType(ProfilingType::Network);
+                    }
+                    else
+                    {
+                        std::cerr << "Invalid profiling type: " << type << std::endl;
+                    }
                 }
             }
         }

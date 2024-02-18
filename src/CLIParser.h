@@ -25,7 +25,8 @@ public:
     Memory,
     IO,
     Network,
-    Default
+    Default,
+    Custom
   };
 
   // Parses the cli arguments and sets flags/values.
