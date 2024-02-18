@@ -83,34 +83,32 @@ bool CLIParser::parseArgs()
                         perfOpts += "-e " + event + " ";
                     }
 
-                    profType = CLIParser::ProfilingType::Custom;
+                    addProfilingType(ProfilingType::Custom);
+                }
+
+                else if (type == "cpu")
+                {
+                    addProfilingType(ProfilingType::CPU);
+                }
+                else if (type == "offcpu")
+                {
+                    addProfilingType(ProfilingType::OffCPU);
+                }
+                else if (type == "mem")
+                {
+                    addProfilingType(ProfilingType::Memory);
+                }
+                else if (type == "io")
+                {
+                    addProfilingType(ProfilingType::IO);
+                }
+                else if (type == "net")
+                {
+                    addProfilingType(ProfilingType::Network);
                 }
                 else
                 {
-                    if (type == "cpu")
-                    {
-                        addProfilingType(ProfilingType::CPU);
-                    }
-                    else if (type == "offcpu")
-                    {
-                        addProfilingType(ProfilingType::OffCPU);
-                    }
-                    else if (type == "mem")
-                    {
-                        addProfilingType(ProfilingType::Memory);
-                    }
-                    else if (type == "io")
-                    {
-                        addProfilingType(ProfilingType::IO);
-                    }
-                    else if (type == "net")
-                    {
-                        addProfilingType(ProfilingType::Network);
-                    }
-                    else
-                    {
-                        std::cerr << "Invalid profiling type: " << type << std::endl;
-                    }
+                    std::cerr << "Invalid profiling type: " << type << std::endl;
                 }
             }
         }
