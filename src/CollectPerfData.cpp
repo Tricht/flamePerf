@@ -48,6 +48,7 @@ void CollectPerfData::recordPerf()
 
     if (profType == CLIParser::ProfilingType::Custom && !options.empty())
     {
+        options.insert(0, "-F 99 -g ");
         std::istringstream iss(options);
         std::copy(std::istream_iterator<std::string>{iss},
                   std::istream_iterator<std::string>(),

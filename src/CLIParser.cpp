@@ -82,6 +82,8 @@ bool CLIParser::parseArgs()
                     {
                         perfOpts += "-e " + event + " ";
                     }
+
+                    profType = CLIParser::ProfilingType::Custom;
                 }
                 else
                 {
