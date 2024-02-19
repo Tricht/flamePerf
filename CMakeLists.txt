@@ -10,14 +10,12 @@ set(SOURCE_FILES
     src/CLIParser.cpp
     src/CollectPerfData.cpp
     src/FlameGraphGenerator.cpp
-    src/ProfilingManager.cpp
 )
 
 set(HEADER_FILES
     src/CLIParser.h
     src/CollectPerfData.h
     src/FlameGraphGenerator.h
-    src/ProfilingManager.h
 )
 
 add_executable(flamePerf ${SOURCE_FILES} ${HEADER_FILES})
