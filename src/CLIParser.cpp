@@ -2,7 +2,6 @@
 // Implements the CLIParser class methods defined in CLIParser.h.
 
 #include "CLIParser.h"
-#include "ProfilingManager.h"
 #include <iostream>
 #include <sstream>
 
@@ -15,9 +14,6 @@ bool CLIParser::parseArgs()
         showHelp();
         return false;
     }
-
-    ProfilingManager profilingManager("../profiles.txt");
-    auto customProfiles = profilingManager.loadProfiles();
 
     for (int i = 1; i < argc; ++i)
     {
@@ -70,24 +66,9 @@ bool CLIParser::parseArgs()
             std::string types = argv[++i];
             std::istringstream typesStream(types);
             std::string type;
-
             while (std::getline(typesStream, type, ','))
             {
-                if (customProfiles.find(type) != customProfiles.end())
-                {
-                    std::string events = customProfiles[type];
-                    std::istringstream eventsStream(events);
-                    std::string event;
-                    while (std::getline(eventsStream, event, ','))
-                    {
-                        perfOpts += "-e " + event + " ";
-                    }
-
-                    profType = ProfilingType::Custom;
-                    addProfilingType(ProfilingType::Custom);
-                }
-
-                else if (type == "cpu")
+                if (type == "cpu")
                 {
                     addProfilingType(ProfilingType::CPU);
                 }
@@ -116,18 +97,6 @@ bool CLIParser::parseArgs()
         else if (arg == "-f" || arg == "--filename")
         {
             setCustomFileName(argv[++i]);
-        }
-        else if (arg == "--custom-profile")
-        {
-            std::string profile = argv[++i];
-            auto deliPos = profile.find("=");
-            if (deliPos != std::string::npos)
-            {
-                std::string profName = profile.substr(0, deliPos);
-                std::string profEvents = profile.substr(deliPos + 1);
-                profilingManager.saveProfile(profName, profEvents);
-                return false;
-            }
         }
         else if (arg == "-h" || "--help")
         {

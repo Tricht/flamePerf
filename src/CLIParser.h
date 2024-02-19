@@ -8,7 +8,6 @@
 #include <set>
 #include <string>
 #include <vector>
-#include <map>
 
 // CLIParser class provides functions to parse and store cli arguments
 class CLIParser
@@ -25,8 +24,7 @@ public:
     Memory,
     IO,
     Network,
-    Default,
-    Custom
+    Default
   };
 
   // Parses the cli arguments and sets flags/values.

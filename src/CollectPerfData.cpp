@@ -46,16 +46,8 @@ void CollectPerfData::recordPerf()
     args.push_back("perf");
     args.push_back("record");
 
-    if (profType == CLIParser::ProfilingType::Custom && !options.empty())
-    {
-        options.insert(0, "-F 99 -g ");
-        std::istringstream iss(options);
-        std::copy(std::istream_iterator<std::string>{iss},
-                  std::istream_iterator<std::string>(),
-                  std::back_inserter(args));
-    }
     // insert perf options chosen by user
-    else if (!options.empty())
+    if (!options.empty())
     {
         std::istringstream iss(options);
         std::copy(std::istream_iterator<std::string>{iss},
@@ -202,7 +194,6 @@ void CollectPerfData::setProfilingType(CLIParser::ProfilingType type)
 
     // options 'base' will operate by a frequency of 99Hz and creates stacktraces
     options += "-F 99 -g ";
-
     for (const auto &event : filteredEvents)
     {
         // add event to call
