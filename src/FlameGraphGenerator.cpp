@@ -152,7 +152,7 @@ std::string FlameGraphGenerator::collapseStack()
     tempScriptFile << perfData;
     tempScriptFile.close();
 
-    std::string cmd = "perl " + collapseScriptPath + " " + tempPerfScript;
+    std::string cmd = "perl " + collapseScriptPath + " --all " + tempPerfScript;
 
     std::cout << cmd << std::endl; // DEBUG
 
