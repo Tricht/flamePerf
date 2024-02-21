@@ -80,6 +80,18 @@ bool CLIParser::parseArgs()
                 {
                     addProfilingType(ProfilingType::Memory);
                 }
+                else if (type == "cacheref")
+                {
+                    addProfilingType(ProfilingType::CacheRef);
+                }
+                else if (type == "cachemiss")
+                {
+                    addProfilingType(ProfilingType::CacheMiss);
+                }
+                else if (type == "pagefaults")
+                {
+                    addProfilingType(ProfilingType::PageFault);
+                }
                 else if (type == "io")
                 {
                     addProfilingType(ProfilingType::IO);

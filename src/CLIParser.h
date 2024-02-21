@@ -22,6 +22,9 @@ public:
     CPU,
     OffCPU,
     Memory,
+    CacheRef,
+    CacheMiss,
+    PageFault,
     IO,
     Network,
     Default
