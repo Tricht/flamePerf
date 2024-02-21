@@ -128,18 +128,18 @@ void FlameGraphGenerator::generateCombinedHtml(const std::vector<std::string> &f
 
 std::string FlameGraphGenerator::collapseStack()
 {
-    /* std::string collapseScriptPath;
+    std::string collapseScriptPath = "";
 
     switch (profType)
     {
     case CLIParser::ProfilingType::OffCPU:
-        collapseScriptPath = "../FlameGraph/stackcollapse-perf.pl";
+        collapseScriptPath = "../FlameGraph/stackcollapse-perf-sched.awk";
         break;
     default:
         collapseScriptPath = "../FlameGraph/stackcollapse-perf.pl";
         break;
-    } */
-    std::string collapseScriptPath = "../FlameGraph/stackcollapse-perf.pl";
+    }
+    // std::string collapseScriptPath = "../FlameGraph/stackcollapse-perf.pl";
 
     std::string tempPerfScript = "tempPerfScript.tmp";
 
@@ -152,7 +152,7 @@ std::string FlameGraphGenerator::collapseStack()
     tempScriptFile << perfData;
     tempScriptFile.close();
 
-    std::string cmd = "perl " + collapseScriptPath + " --all " + tempPerfScript;
+    std::string cmd = "perl " + collapseScriptPath + " " + tempPerfScript;
 
     std::cout << cmd << std::endl; // DEBUG
 

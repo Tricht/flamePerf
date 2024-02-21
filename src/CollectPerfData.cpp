@@ -127,8 +127,18 @@ void CollectPerfData::recordPerf()
 
 std::string CollectPerfData::retriveData()
 {
+    std::string perfData = "";
     // execute perf script
-    std::string perfData = execPerf("perf script");
+    switch (profType)
+    {
+    case CLIParser::ProfilingType::OffCPU:
+        perfData = execPerf("perf script -F comm,pid,tid,cpu,time,period,event,ip,sym,dso,trace");
+        break;
+    default:
+        perfData = execPerf("perf script");
+        break;
+    }
+    
     if (perfData.empty())
     {
         throw std::runtime_error("No output from perf script");
