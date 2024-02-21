@@ -4,7 +4,7 @@
 
 void write_read_large_file() {
     std::ofstream file("large_file.txt");
-    for (int i = 0; i < 10000000; ++i) {
+    for (int i = 0; i < 1000000; ++i) {
         file << "Test I/O" << std::endl;
     }
     file.close();
