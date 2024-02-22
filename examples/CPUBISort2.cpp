@@ -39,7 +39,7 @@ void insertionSort(std::vector<int> &arr)
 int main()
 {
     std::vector<int> dataBubble, dataInsertion;
-    const int sizeBubble = 1000;
+    const int sizeBubble = 5000;
     // Generiere Zufallsdaten
     for (int i = 0; i < sizeBubble; ++i)
     {
@@ -47,7 +47,7 @@ int main()
         dataBubble.push_back(value);
     }
 
-    const int sizeInsertion = 100000;
+    const int sizeInsertion = 30000;
     // Generiere Zufallsdaten
     for (int i = 0; i < sizeInsertion; ++i)
     {
