@@ -6,7 +6,7 @@
 void writeToFile()
 {
     std::ofstream outFile("output.txt");
-    for (int i = 0; i < 1000000; ++i)
+    for (int i = 0; i < 100000; ++i)
     {
         outFile << "Schreiben in Datei" << std::endl;
     }
@@ -15,10 +15,11 @@ void writeToFile()
 void readFromFile()
 {
     std::ifstream inFile("output.txt");
-    std::string line;
-    while (std::getline(inFile, line))
+    char buffer[1];
+    while (inFile.read(buffer, sizeof(buffer)))
     {
-        // Do nothing, just read and discard the lines
+        std::string a = "";
+        a += buffer;
     }
 }
 
