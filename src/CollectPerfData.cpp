@@ -64,7 +64,7 @@ void CollectPerfData::recordPerf()
                   std::back_inserter(args));
     }
 
-    std::cout << "Recorded perf events: " + options << std::endl;
+    std::cout << "Record perf events: " + options << std::endl;
 
     // add command to analyze
     if (!cmdToExecute.empty())
@@ -138,7 +138,7 @@ std::string CollectPerfData::retriveData()
         perfData = execPerf("perf script");
         break;
     }
-    
+
     if (perfData.empty())
     {
         throw std::runtime_error("No output from perf script");
@@ -242,7 +242,7 @@ std::string CollectPerfData::genFileName()
         break;
     case CLIParser::ProfilingType::PageFault:
         ss << "_PageFault";
-        break;            
+        break;
     case CLIParser::ProfilingType::IO:
         ss << "_IO";
         break;
@@ -378,7 +378,7 @@ std::set<std::string> CollectPerfData::getAvailablePerfEvents()
 
 void CollectPerfData::initializeOptimalEvents()
 {
-    optimalEventsForProfiles[CLIParser::ProfilingType::CPU] = {"cpu-clock", "cycles", "instructions"};
+    optimalEventsForProfiles[CLIParser::ProfilingType::CPU] = {"cpu-clock"}; //, "cycles", "instructions"};
     optimalEventsForProfiles[CLIParser::ProfilingType::OffCPU] = {"sched:sched_stat_sleep", "sched:sched_switch", "sched:sched_process_exit"};
     optimalEventsForProfiles[CLIParser::ProfilingType::Memory] = {"cache-misses", "cache-references", "page-faults"};
     optimalEventsForProfiles[CLIParser::ProfilingType::CacheMiss] = {"cache-misses"};

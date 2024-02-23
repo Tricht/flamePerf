@@ -14,7 +14,7 @@ FlameGraphGenerator::FlameGraphGenerator(const std::string &perfData, CLIParser:
 void FlameGraphGenerator::generateFlameGraph(const std::string &outputPath)
 {
     std::string collapsedData = collapseStack();
-    std::cout << "Collapsed Data Length: " << collapsedData.length() << std::endl; // DEBUG
+    // std::cout << "Collapsed Data Length: " << collapsedData.length() << std::endl; // DEBUG
 
     std::string tempCollOut = "tempCollOut.tmp";
 
@@ -53,7 +53,7 @@ void FlameGraphGenerator::generateFlameGraph(const std::string &outputPath)
     if (result != 0)
     {
         std::cerr << "FlameGraph Command: " << flameGraphCmd << std::endl;
-        throw std::runtime_error("Failed to generate flamegraph");
+        throw std::runtime_error("Failed to generate Flame Graph");
     }
 
     if (remove(tempCollOut.c_str()) != 0)
@@ -154,7 +154,7 @@ std::string FlameGraphGenerator::collapseStack()
 
     std::string cmd = "perl " + collapseScriptPath + " " + tempPerfScript;
 
-    std::cout << cmd << std::endl; // DEBUG
+    // std::cout << cmd << std::endl; // DEBUG
 
     std::array<char, 128> buffer;
     std::string result;
@@ -192,7 +192,7 @@ void FlameGraphGenerator::generateDiffFlameGraph(const std::string &file1, const
     int result = system(diffCmd.c_str());
     if (result != 0)
     {
-        throw std::runtime_error("Failed to generate differential Flamegraph");
+        throw std::runtime_error("Failed to generate differential Flame Graph");
     }
 
     if (remove("out.folded1") != 0)

@@ -50,7 +50,7 @@ int main(int argc, char **argv)
             }
         }
 
-        std::cout << "Flamegraph(s) successfully generated" << std::endl;
+        std::cout << "Flame Graph(s) successfully generated" << std::endl;
     }
     catch (const std::exception &e)
     {
