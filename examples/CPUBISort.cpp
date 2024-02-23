@@ -2,25 +2,33 @@
 #include <vector>
 #include <chrono>
 
-void bubbleSort(std::vector<int>& arr) {
+void bubbleSort(std::vector<int> &arr)
+{
     bool swapped;
-    for (size_t i = 0; i < arr.size() - 1; i++) {
+    for (size_t i = 0; i < arr.size() - 1; i++)
+    {
         swapped = false;
-        for (size_t j = 0; j < arr.size() - i - 1; j++) {
-            if (arr[j] > arr[j + 1]) {
+        for (size_t j = 0; j < arr.size() - i - 1; j++)
+        {
+            if (arr[j] > arr[j + 1])
+            {
                 std::swap(arr[j], arr[j + 1]);
                 swapped = true;
             }
         }
-        if (!swapped) break; // Stoppt, wenn kein Tausch erforderlich ist
+        if (!swapped)
+            break;
     }
 }
 
-void insertionSort(std::vector<int>& arr) {
-    for (size_t i = 1; i < arr.size(); i++) {
+void insertionSort(std::vector<int> &arr)
+{
+    for (size_t i = 1; i < arr.size(); i++)
+    {
         int key = arr[i];
         int j = i - 1;
-        while (j >= 0 && arr[j] > key) {
+        while (j >= 0 && arr[j] > key)
+        {
             arr[j + 1] = arr[j];
             j = j - 1;
         }
@@ -28,11 +36,13 @@ void insertionSort(std::vector<int>& arr) {
     }
 }
 
-int main() {
+int main()
+{
     std::vector<int> dataBubble, dataInsertion;
     const int size = 10000;
-    // Generiere Zufallsdaten
-    for (int i = 0; i < size; ++i) {
+
+    for (int i = 0; i < size; ++i)
+    {
         int value = rand() % size;
         dataBubble.push_back(value);
         dataInsertion.push_back(value);
@@ -41,13 +51,13 @@ int main() {
     auto start = std::chrono::high_resolution_clock::now();
     bubbleSort(dataBubble);
     auto end = std::chrono::high_resolution_clock::now();
-    std::cout << "Bubble Sort dauerte " 
+    std::cout << "Bubble Sort duration: "
               << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms." << std::endl;
 
     start = std::chrono::high_resolution_clock::now();
     insertionSort(dataInsertion);
     end = std::chrono::high_resolution_clock::now();
-    std::cout << "Insertion Sort dauerte " 
+    std::cout << "Insertion Sort duration: "
               << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms." << std::endl;
 
     return 0;

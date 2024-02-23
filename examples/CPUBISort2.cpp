@@ -17,7 +17,7 @@ void bubbleSort(std::vector<int> &arr)
             }
         }
         if (!swapped)
-            break; // Stoppt, wenn kein Tausch erforderlich ist
+            break;
     }
 }
 
@@ -58,13 +58,13 @@ int main()
     auto start = std::chrono::high_resolution_clock::now();
     bubbleSort(dataBubble);
     auto end = std::chrono::high_resolution_clock::now();
-    std::cout << "Bubble Sort dauerte "
+    std::cout << "Bubble Sort duration: "
               << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms." << std::endl;
 
     start = std::chrono::high_resolution_clock::now();
     insertionSort(dataInsertion);
     end = std::chrono::high_resolution_clock::now();
-    std::cout << "Insertion Sort dauerte "
+    std::cout << "Insertion Sort duration: "
               << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms." << std::endl;
 
     return 0;
