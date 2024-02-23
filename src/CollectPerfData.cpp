@@ -378,7 +378,7 @@ std::set<std::string> CollectPerfData::getAvailablePerfEvents()
 
 void CollectPerfData::initializeOptimalEvents()
 {
-    optimalEventsForProfiles[CLIParser::ProfilingType::CPU] = {"cpu-clock"}; //, "cycles", "instructions"};
+    optimalEventsForProfiles[CLIParser::ProfilingType::CPU] = {"cpu-clock", "cycles", "instructions"};
     optimalEventsForProfiles[CLIParser::ProfilingType::OffCPU] = {"sched:sched_stat_sleep", "sched:sched_switch", "sched:sched_process_exit"};
     optimalEventsForProfiles[CLIParser::ProfilingType::Memory] = {"cache-misses", "cache-references", "page-faults"};
     optimalEventsForProfiles[CLIParser::ProfilingType::CacheMiss] = {"cache-misses"};
