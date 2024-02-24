@@ -1,61 +1,71 @@
 #include <iostream>
-#include <unistd.h>
+#include <vector>
+#include <chrono>
 
-void add(int n)
+void bubbleSort(std::vector<int> &arr)
 {
-    long sum = 0;
-    for (int i = 0; i < n; ++i)
+    bool swapped;
+    for (size_t i = 0; i < arr.size() - 1; i++)
     {
-        sum += i;
-        usleep(5000);
+        swapped = false;
+        for (size_t j = 0; j < arr.size() - i - 1; j++)
+        {
+            if (arr[j] > arr[j + 1])
+            {
+                std::swap(arr[j], arr[j + 1]);
+                swapped = true;
+            }
+        }
+        if (!swapped)
+            break;
     }
-    std::cout << "Sum: " << sum << std::endl;
 }
 
-void subtract(int n)
+void insertionSort(std::vector<int> &arr)
 {
-    long diff = 0;
-    for (int i = 0; i < n; ++i)
+    for (size_t i = 1; i < arr.size(); i++)
     {
-        diff -= i;
-        usleep(5000);
+        int key = arr[i];
+        int j = i - 1;
+        while (j >= 0 && arr[j] > key)
+        {
+            arr[j + 1] = arr[j];
+            j = j - 1;
+        }
+        arr[j + 1] = key;
     }
-    std::cout << "Diff: " << diff << std::endl;
-}
-
-void multiply(int n)
-{
-    long prod = 1;
-    for (int i = 1; i <= n; ++i)
-    {
-        prod *= i;
-        usleep(5000);
-    }
-    std::cout << "Prod: " << prod << std::endl;
-}
-
-void divide(int n)
-{
-    long double div = 1.0;
-    for (int i = 1; i <= n; ++i)
-    {
-        div /= i;
-        usleep(5000);
-    }
-    std::cout << "Div: " << div << std::endl;
 }
 
 int main(int argc, char *argv[])
 {
-    int addNum = atoi(argv[1]);
-    int subNum = atoi(argv[2]);
-    int multNum = atoi(argv[3]);
-    int divNum = atoi(argv[4]);
+    std::vector<int> dataBubble, dataInsertion;
+    const int sizeBubble = atoi(argv[1]);
+    // Generiere Zufallsdaten
+    for (int i = 0; i < sizeBubble; ++i)
+    {
+        int value = rand() % sizeBubble;
+        dataBubble.push_back(value);
+    }
 
-    add(addNum);
-    subtract(subNum);
-    multiply(multNum);
-    divide(divNum);
+    const int sizeInsertion = atoi(argv[2]);
+    // Generiere Zufallsdaten
+    for (int i = 0; i < sizeInsertion; ++i)
+    {
+        int value = rand() % sizeInsertion;
+        dataInsertion.push_back(value);
+    }
+
+    auto start = std::chrono::high_resolution_clock::now();
+    bubbleSort(dataBubble);
+    auto end = std::chrono::high_resolution_clock::now();
+    std::cout << "Bubble Sort duration: "
+              << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms." << std::endl;
+
+    start = std::chrono::high_resolution_clock::now();
+    insertionSort(dataInsertion);
+    end = std::chrono::high_resolution_clock::now();
+    std::cout << "Insertion Sort duration: "
+              << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms." << std::endl;
 
     return 0;
 }
