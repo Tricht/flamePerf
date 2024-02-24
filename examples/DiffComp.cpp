@@ -45,14 +45,17 @@ void divide(int n)
     std::cout << "Div: " << div << std::endl;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
-    int n = 1000;
+    int addNum = atoi(argv[1]);
+    int subNum = atoi(argv[2]);
+    int multNum = atoi(argv[3]);
+    int divNum = atoi(argv[4]);
 
-    add(n);
-    subtract(n);
-    multiply(n);
-    divide(n);
+    add(addNum);
+    subtract(subNum);
+    multiply(multNum);
+    divide(divNum);
 
     return 0;
 }
