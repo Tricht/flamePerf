@@ -9,7 +9,6 @@ void intensiveComputation()
     {
         std::vector<int> temp(100, i);
     }
-    std::this_thread::sleep_for(std::chrono::seconds(5));
 }
 
 void sleepFunction()
@@ -21,6 +20,7 @@ int main()
 {
     auto start = std::chrono::high_resolution_clock::now();
     intensiveComputation();
+    std::this_thread::sleep_for(std::chrono::seconds(5));
     auto end = std::chrono::high_resolution_clock::now();
     std::cout << "Computation duration "
               << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms." << std::endl;
