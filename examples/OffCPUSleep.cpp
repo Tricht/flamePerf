@@ -9,13 +9,12 @@ void intensiveComputation()
     for (long i = 0; i < 10000; ++i)
     {
         std::vector<int> temp(100, i);
-        usleep(100000);
     }
 }
 
 void sleepFunction()
 {
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+    sleep(10);
 }
 
 int main()
@@ -26,13 +25,13 @@ int main()
     std::cout << "Computation duration "
               << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms." << std::endl;
 
-    /*     start = std::chrono::high_resolution_clock::now();
-        sleepFunction();
-        end = std::chrono::high_resolution_clock::now();
-        std::cout << "Sleep Function duration "
-                  << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms." << std::endl;
+    start = std::chrono::high_resolution_clock::now();
+    sleepFunction();
+    end = std::chrono::high_resolution_clock::now();
+    std::cout << "Sleep Function duration "
+              << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms." << std::endl;
 
-        start = std::chrono::high_resolution_clock::now();
+    /*    start = std::chrono::high_resolution_clock::now();
         intensiveComputation();
         end = std::chrono::high_resolution_clock::now();
         std::cout << "Computation duration "
