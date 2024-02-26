@@ -18,8 +18,6 @@ void readFromFile()
     char buffer[1];
     while (inFile.read(buffer, sizeof(buffer)))
     {
-        // std::string a = "";
-        // a += buffer;
     }
 }
 
