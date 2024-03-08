@@ -31,11 +31,5 @@ int main()
     std::cout << "Sleep Function duration "
               << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms." << std::endl;
 
-    /*    start = std::chrono::high_resolution_clock::now();
-        intensiveComputation();
-        end = std::chrono::high_resolution_clock::now();
-        std::cout << "Computation duration "
-                  << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms." << std::endl; */
-
     return 0;
 }

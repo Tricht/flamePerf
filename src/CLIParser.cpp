@@ -80,18 +80,6 @@ bool CLIParser::parseArgs()
                 {
                     addProfilingType(ProfilingType::Memory);
                 }
-                else if (type == "cacheref")
-                {
-                    addProfilingType(ProfilingType::CacheRef);
-                }
-                else if (type == "cachemiss")
-                {
-                    addProfilingType(ProfilingType::CacheMiss);
-                }
-                else if (type == "pagefaults")
-                {
-                    addProfilingType(ProfilingType::PageFault);
-                }
                 else if (type == "io")
                 {
                     addProfilingType(ProfilingType::IO);
@@ -201,5 +189,5 @@ void CLIParser::showHelp()
     std::cout << "  --all-profiles\t\tRecord all available profiles" << std::endl;
     std::cout << "  -p, --profile-types\tSpecify types of profiles to record" << std::endl;
     std::cout << "  -f, --filename\tSet name for sstack profiles and flamegraphs" << std::endl;
-    std::cout << "Example: flamePerf -d 5 --all-profiles" << std::endl;
+    std::cout << "Example: flamePerf -p cpu -d 5 -c \"./exampleCmd 123\"" << std::endl;
 }
