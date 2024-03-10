@@ -12,7 +12,7 @@ void inefficientMemoryUse()
 void efficientMemoryUse()
 {
     auto sharedData = std::make_shared<std::vector<int>>(10000000, 42);
-    auto dataReference = sharedData; // Teilt die Daten ohne Kopie
+    auto dataReference = sharedData;
     std::cout << "Data shared with shared pointer" << std::endl;
 }
 
