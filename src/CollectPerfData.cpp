@@ -234,15 +234,6 @@ std::string CollectPerfData::genFileName()
     case CLIParser::ProfilingType::Memory:
         ss << "_Mem";
         break;
-    case CLIParser::ProfilingType::CacheRef:
-        ss << "_CacheRef";
-        break;
-    case CLIParser::ProfilingType::CacheMiss:
-        ss << "_CacheMiss";
-        break;
-    case CLIParser::ProfilingType::PageFault:
-        ss << "_PageFault";
-        break;
     case CLIParser::ProfilingType::IO:
         ss << "_IO";
         break;
