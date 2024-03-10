@@ -103,8 +103,8 @@ void FlameGraphGenerator::generateCombinedHtml(const std::vector<std::string> &f
         }
 
         // create tab and content area for specific flamegraph
-        tabs += "<div class='tab" + std::string(i == 0 ? " active" : "") + "' onclick='openTab(event, \"tab" + std::to_string(i + 1) + "\")'>" + profileName + "</div>";
-        content += "<div id='tab" + std::to_string(i + 1) + "' class='content flamegraph" + std::string(i == 0 ? " active" : "") + "'>";
+        tabs += "<div class='tab" + std::string((!isDiff && i == 0) ? " active" : "") + "' onclick='openTab(event, \"tab" + std::to_string(i + 1) + "\")'>" + profileName + "</div>";
+        content += "<div id='tab" + std::to_string(i + 1) + "' class='content flamegraph" + std::string((!isDiff && i == 0) ? " active" : "") + "'>";
         content += "<object data='" + svgFilePath + "' type='image/svg+xml' id='flamegraph" + std::to_string(i + 1) + "' width='100%' height='100%'></object>";
         content += "</div>";
     }
